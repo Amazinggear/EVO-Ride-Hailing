@@ -205,14 +205,13 @@ export default function AdminsPage() {
                 {admins.map((admin) => (
                   <tr
                     key={admin.id}
-                    onClick={() => selectAdmin(admin)}
-                    className={`cursor-pointer transition-colors ${
+                    className={`transition-colors cursor-pointer ${
                       selectedAdmin?.id === admin.id
                         ? 'bg-[var(--color-brand-500)]/10 border-r-2 border-r-[var(--color-brand-500)]'
                         : 'hover:bg-white/5'
                     }`}
                   >
-                    <td className="px-5 py-4 font-bold text-white">{admin.full_name}</td>
+                    <td className="px-5 py-4 font-bold text-white" onClick={() => selectAdmin(admin)}>{admin.full_name}</td>
                     <td className="px-4 py-4 text-gray-300 font-cy-bold" dir="ltr">{admin.email}</td>
                     <td className="px-4 py-4">
                       <select 
