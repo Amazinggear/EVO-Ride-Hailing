@@ -1,0 +1,73 @@
+# ================================================
+# EVO Backend — Render Deployment Configuration
+# Deploy: Push to GitHub → Connect repo on render.com
+# Free tier: 750 hrs/mo, sleeps after 15 min inactivity
+# Keep alive: Use UptimeRobot (free) to ping /health every 5 min
+# ================================================
+
+services:
+  - type: web
+    name: evo-backend
+    env: node
+    region: frankfurt  # Closest to Jordan 🇯🇴
+    plan: free
+    healthCheckPath: /health
+    buildCommand: npm install
+    startCommand: npm start
+    # ⚡ Auto-deploy on push to main branch
+    autoDeploy: true
+    
+    envVars:
+      # ── App ──
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: LOG_LEVEL
+        value: info
+      
+      # ── Database (Neon PostgreSQL) ──
+      - key: DATABASE_URL
+        sync: false  # Set manually in Render Dashboard
+      
+      # ── Redis (Upstash) ──
+      - key: UPSTASH_REDIS_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      
+      # ── JWT ──
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      
+      # ── Firebase ──
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      
+      # ── OneSignal ──
+      - key: ONESIGNAL_APP_ID
+        sync: false
+      - key: ONESIGNAL_REST_API_KEY
+        sync: false
+      
+      # ── Google Maps ──
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      
+      # ── CORS ──
+      - key: ALLOWED_ORIGINS
+        value: https://evo-admin.vercel.app,http://localhost:3000
+      
+      # ── PayTabs ──
+      - key: PAYTABS_PROFILE_ID
+        sync: false
+      - key: PAYTABS_SERVER_KEY
+        sync: false
+      - key: PAYTABS_REGION
+        value: JO

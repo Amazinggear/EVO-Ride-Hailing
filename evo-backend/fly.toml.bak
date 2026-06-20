@@ -1,0 +1,32 @@
+# ================================================
+# EVO Backend — Fly.io Deployment
+# Free: 3 VMs × 256MB RAM, 24/7 no sleep
+# ================================================
+
+app = "evo-backend"
+primary_region = "ams"  # Amsterdam (closest to Jordan)
+
+[build]
+  image = "node:20-alpine"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = false   # ← KEY: Never sleep!
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    path = "/health"
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "10s"
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 256

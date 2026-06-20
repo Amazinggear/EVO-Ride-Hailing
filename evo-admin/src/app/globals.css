@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --font-alexandria: var(--font-alexandria), sans-serif;
+  --font-cy-bold: var(--font-cy-bold), sans-serif;
+  
+  --color-brand-50: #0a1f13;
+  --color-brand-100: #0d2e1a;
+  --color-brand-200: #124a29;
+  --color-brand-300: #166939;
+  --color-brand-400: #1a8f4c;
+  --color-brand-500: #00C853; /* Primary Emerald Green (Neon) */
+  --color-brand-600: #00a644;
+  --color-brand-700: #008234;
+  --color-brand-800: #006126;
+  --color-brand-900: #004219;
+
+  --color-background: #0B0F19; /* Deep Dark Background */
+  --color-foreground: #FFFFFF; /* Pure White text */
+  --color-card: #141824; /* Card Background */
+
+  --color-pastel-purple: #231C35;
+  --color-pastel-blue: #1C2635;
+  --color-pastel-green: #1A3125;
+  --color-pastel-orange: #35241C;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* ═══ Global Typography Enforcement ═══ */
+body, input, button, textarea, select, a, p, span, h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-alexandria), sans-serif;
+}
+
+.font-cy-bold {
+  font-family: var(--font-cy-bold), sans-serif !important;
+}
+
+/* ═══ Smooth Scrolling & Interactivity ═══ */
+html {
+  scroll-behavior: smooth;
+}
+
+button, a, input, select, textarea {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active, a:active {
+  transform: scale(0.97);
+}
+
+/* Clean scrollbar for the entire app */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background); 
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-card); 
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-500); 
+}
+
+@keyframes fade-in-up {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-250 { animation-delay: 250ms; }
+.delay-300 { animation-delay: 300ms; }
