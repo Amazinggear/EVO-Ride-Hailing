@@ -195,8 +195,7 @@ export default function DashboardHome() {
               </div>
             </div>
             <h2 className="text-[2rem] font-cy-bold leading-none mb-4 tracking-tight drop-shadow-sm flex items-center gap-1 text-white">
-              <span className="text-xl text-[var(--color-brand-500)]">$</span>
-              {(stats?.totalRevenueToday ?? 125514.99).toLocaleString('en-US')}
+              {(stats?.totalRevenueToday ?? 0).toFixed(2)} <span className="text-lg text-gray-500">د.أ</span>
             </h2>
             <div className="inline-flex items-center gap-1.5 bg-[var(--color-brand-500)]/10 border border-[var(--color-brand-500)]/20 text-[var(--color-brand-500)] text-xs px-3 py-1.5 rounded-full w-fit">
               <span className="font-cy-bold">↑</span> <span className="font-cy-bold">+5%</span> من الشهر الماضي
@@ -213,7 +212,7 @@ export default function DashboardHome() {
             </div>
           </div>
           <h2 className="text-[2rem] font-cy-bold text-white leading-none mb-4 tracking-tight flex items-baseline gap-2">
-            {stats?.totalRidesToday ?? 31} <span className="text-sm text-gray-500 font-bold font-alexandria">رحلة</span>
+            {stats?.totalRidesToday ?? 0} <span className="text-sm text-gray-500 font-bold font-alexandria">رحلة</span>
           </h2>
           <div className="inline-flex items-center gap-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium text-xs px-3 py-1.5 rounded-full w-fit">
             <span className="font-cy-bold">↑</span> <span className="font-cy-bold">+3%</span> زيادة عن الشهر الماضي
@@ -229,10 +228,10 @@ export default function DashboardHome() {
             </div>
           </div>
           <h2 className="text-[2rem] font-cy-bold text-white leading-none mb-4 tracking-tight">
-            {stats?.activeDrivers ?? 12}
+            {stats?.activeDrivers ?? 0}
           </h2>
           <div className="inline-flex items-center gap-1.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium text-xs px-3 py-1.5 rounded-full w-fit">
-            <span className="font-cy-bold">↑</span> <span className="font-cy-bold">+6%</span> زيادة عن الشهر الماضي
+            <span className="font-cy-bold">●</span> متصل الآن
           </div>
         </div>
 
@@ -247,7 +246,7 @@ export default function DashboardHome() {
               </div>
             </div>
             <h2 className="text-[2rem] font-cy-bold text-white leading-none mb-4 tracking-tight">
-              {stats?.pendingApprovals ?? 2}
+              {stats?.pendingApprovals ?? 0}
             </h2>
             <div className="inline-flex items-center gap-1.5 bg-orange-500/10 text-orange-400 border border-orange-500/20 font-medium text-xs px-3 py-1.5 rounded-full w-fit">
               <span className="font-cy-bold">↑</span> بانتظار الموافقة
@@ -263,7 +262,7 @@ export default function DashboardHome() {
           <div className="flex justify-between items-start mb-6">
             <div>
               <h3 className="font-bold text-white mb-1">ملخص الإيرادات</h3>
-              <p className="text-[var(--color-brand-500)] font-cy-bold text-sm">$1,804.55</p>
+              <p className="text-[var(--color-brand-500)] font-cy-bold text-sm">{stats?.totalRevenueToday?.toFixed(2) ?? '0.00'} د.أ اليوم</p>
             </div>
             <div className="flex gap-2 bg-[#0B0F19] p-1 rounded-full border border-white/5">
               <button className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-brand-500)] text-white shadow-[0_0_10px_rgba(0,200,83,0.3)]">يوم</button>
