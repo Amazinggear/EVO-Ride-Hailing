@@ -97,7 +97,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function FinancialReportsPage() {
   const [period, setPeriod] = useState<Period>("week");
-  const [summary, setSummary] = useState<FinancialSummary>(MOCK_SUMMARY);
+  const [summary, setSummary] = useState<FinancialSummary>({ totalRevenue: 0, totalCommission: 0, totalTrips: 0, activeDrivers: 0, activePassengers: 0 });
   const [loading, setLoading] = useState(false);
   const chartData = period === "week" ? weeklyRevenue : monthlyRevenue;
   const xKey = "label";
@@ -123,7 +123,7 @@ export default function FinancialReportsPage() {
           });
         }
       })
-      .catch(() => setSummary(MOCK_SUMMARY))
+      .catch(() => { console.error('Failed to fetch financial summary'); }) // No mock in production
       .finally(() => setLoading(false));
   }, []);
 

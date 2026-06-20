@@ -57,7 +57,7 @@ const formatDetails = (details?: Record<string, unknown>) => {
 type ActionFilter = "all" | keyof typeof ACTION_CONFIG;
 
 export default function AuditLogPage() {
-  const [logs, setLogs] = useState<AuditLog[]>(MOCK_LOGS);
+  const [logs, setLogs] = useState<AuditLog[]>([]);
   const [filter, setFilter] = useState<ActionFilter>("all");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -88,7 +88,10 @@ export default function AuditLogPage() {
           })));
         }
       })
-      .catch(() => setLogs(MOCK_LOGS))
+      .catch(() => {
+        console.error('Failed to fetch audit logs');
+        if (process.env.NODE_ENV !== 'development') setLogs([]); // No mock in production
+      })
       .finally(() => setLoading(false));
   }, []);
 

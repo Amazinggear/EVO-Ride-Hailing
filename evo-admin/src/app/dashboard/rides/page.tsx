@@ -97,19 +97,8 @@ export default function RidesPage() {
       const json = await res.json();
       setData(json);
     } catch {
-      // Mock
-      const allMock = genMockRides();
-      const filtered = statusFilter === 'all' ? allMock : allMock.filter(r => r.status === statusFilter);
-      const totalRev = filtered.filter(r => r.status === 'completed').reduce((s, r) => s + r.fare, 0);
-      const totalCom = filtered.filter(r => r.status === 'completed').reduce((s, r) => s + r.commission, 0);
-      const sliced = filtered.slice((page - 1) * PAGE_LIMIT, page * PAGE_LIMIT);
-      setData({
-        rides: sliced,
-        total: filtered.length,
-        page,
-        total_pages: Math.ceil(filtered.length / PAGE_LIMIT),
-        summary: { total_revenue: totalRev, total_commission: totalCom, total_rides: filtered.length },
-      });
+      console.error('Failed to fetch rides');
+      setData({ rides: [], total: 0, total_pages: 0, summary: { total_rides: 0, total_revenue: 0, total_commission: 0 } });
     } finally {
       setLoading(false);
     }

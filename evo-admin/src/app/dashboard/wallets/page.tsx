@@ -77,23 +77,8 @@ function WalletsContent() {
       }));
       setWallets(mapped);
     } catch {
-      // Mock
-      const mock: DriverWallet[] = [
-        { user_id: "1", full_name: "أحمد الخالدي", phone: "+962791234567", car_plate: "87-12345",
-          car_type: "ev_sedan", car_model: "Tesla Model 3", cliq_alias: "0791234567",
-          wallet_balance: 18.50, total_commission_paid: 45.20, total_rides: 142, approval_status: "approved" },
-        { user_id: "2", full_name: "سامر النعيمي", phone: "+962790987654", car_plate: "23-45678",
-          car_type: "ev_suv", car_model: "BYD Atto 3", cliq_alias: "0790987654",
-          wallet_balance: 2.10, total_commission_paid: 120.80, total_rides: 387, approval_status: "approved" },
-        { user_id: "3", full_name: "ياسر المطيري", phone: "+962795555111", car_plate: "11-11111",
-          car_type: "ev_mini", car_model: "Nissan Leaf", cliq_alias: "0795555111",
-          wallet_balance: 1.20, total_commission_paid: 28.30, total_rides: 89, approval_status: "approved" },
-        { user_id: "4", full_name: "عمر الشرع", phone: "+962796000222", car_plate: "55-23456",
-          car_type: "ev_taxi", car_model: "BYD e6", cliq_alias: "0796000222",
-          wallet_balance: 32.00, total_commission_paid: 88.60, total_rides: 278, approval_status: "approved" },
-      ];
-      setWallets(mock);
-    } finally {
+      console.error('Failed to fetch wallets');
+      setWallets([]); // No mock in production
       setLoading(false);
     }
   }, [showLowOnly]);

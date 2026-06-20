@@ -77,20 +77,9 @@ export default function PricingPage() {
       setPricing(map);
       setEditable(editMap);
     } catch {
-      // Dev mock
-      const map: Record<string, PricingConfig> = {};
-      const editMap: Record<string, EditableConfig> = {};
-      MOCK_PRICING.forEach(p => {
-        map[p.car_type] = p;
-        editMap[p.car_type] = {
-          base_fare:   String(p.base_fare),
-          per_km_rate: String(p.per_km_rate),
-          per_min_rate:String(p.per_min_rate),
-          min_fare:    String(p.min_fare),
-        };
-      });
-      setPricing(map);
-      setEditable(editMap);
+      console.error('Failed to fetch pricing - using empty state');
+      setPricing({});
+      setEditable({});
     } finally {
       setLoading(false);
     }

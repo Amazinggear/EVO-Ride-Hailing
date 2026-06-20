@@ -50,29 +50,8 @@ export default function PendingDriversPage() {
       const data = await res.json();
       setDrivers(data.drivers || []);
     } catch {
-      // Mock data for development
-      setDrivers([
-        {
-          id: "uuid-1", full_name: "أحمد محمد الخالدي", phone: "+962791234567",
-          date_of_birth: "1992-05-14", cliq_alias: "0791234567",
-          national_id_number: "9912345678",
-          national_id_front_url: "", national_id_back_url: "", personal_photo_url: "",
-          license_number: "D-1234567", license_photo_url: "", criminal_clearance_url: "",
-          car_model: "Tesla Model 3 2023", car_plate: "87-12345", car_type: "ev_sedan",
-          submitted_at: new Date().toISOString(),
-        },
-        {
-          id: "uuid-2", full_name: "سامر إبراهيم النعيمي", phone: "+962790987654",
-          date_of_birth: "1988-11-20", cliq_alias: "0790987654",
-          national_id_number: "8898765432",
-          national_id_front_url: "", national_id_back_url: "", personal_photo_url: "",
-          license_number: "D-7654321", license_photo_url: "", criminal_clearance_url: "",
-          car_model: "BYD Atto 3 2024", car_plate: "23-45678", car_type: "ev_suv",
-          submitted_at: new Date(Date.now() - 3600000).toISOString(),
-        },
-      ]);
-    } finally {
-      setLoading(false);
+      console.error('Failed to fetch pending drivers');
+      setDrivers([]); // No mock in production
     }
   }, []);
 
