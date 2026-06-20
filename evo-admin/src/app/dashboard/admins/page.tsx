@@ -161,6 +161,12 @@ export default function AdminsPage() {
     return `${Math.floor(h / 24)} يوم`;
   };
 
+  const isOnline = (date?: string) => {
+    if (!date) return false;
+    const diff = Math.floor((Date.now() - new Date(date).getTime()) / 60000);
+    return diff < 2; // active if last seen within 2 minutes (ping every 1 min)
+  };
+
   return (
     <>
       <div dir="rtl" className="space-y-6 animate-fade-in-up">
@@ -229,8 +235,12 @@ export default function AdminsPage() {
                     <td className="px-4 py-4 text-center text-white font-cy-bold text-xs">
                       {admin.total_hours ? `${admin.total_hours} س` : '—'}
                     </td>
-                    <td className="px-4 py-4 text-center text-gray-400 text-xs font-bold">
-                      {timeAgo(admin.last_seen)}
+                    <td className="px-4 py-4 text-center text-xs font-bold">
+                      {isOnline(admin.last_seen) ? (
+                        <span className="text-green-400">🟢 الآن</span>
+                      ) : (
+                        <span className="text-gray-400">{timeAgo(admin.last_seen)}</span>
+                      )}
                     </td>
                     <td className="px-4 py-4 text-center">
                       <button
@@ -275,8 +285,8 @@ export default function AdminsPage() {
                 </div>
                 <div className="bg-white/5 rounded-lg p-2 text-center">
                   <p className="text-gray-500">الحالة</p>
-                  <p className={`font-bold ${selectedAdmin.status === 'active' ? 'text-green-400' : 'text-red-400'}`}>
-                    {selectedAdmin.status === 'active' ? '🟢 نشط' : '🔴 موقوف'}
+                  <p className={`font-bold ${isOnline(selectedAdmin.last_seen) ? 'text-green-400' : 'text-gray-500'}`}>
+                    {isOnline(selectedAdmin.last_seen) ? '🟢 متصل' : '🔴 غير متصل'}
                   </p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-2 text-center">
@@ -299,8 +309,8 @@ export default function AdminsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">آخر نشاط:</span>
-                  <span className={timeAgo(selectedAdmin.last_seen) === 'الآن' ? 'text-green-400 font-bold' : 'text-gray-300'}>
-                    {timeAgo(selectedAdmin.last_seen)}
+                  <span className={isOnline(selectedAdmin.last_seen) ? 'text-green-400 font-bold' : 'text-gray-300'}>
+                    {isOnline(selectedAdmin.last_seen) ? '🟢 متصل الآن' : timeAgo(selectedAdmin.last_seen)}
                   </span>
                 </div>
               </div>
