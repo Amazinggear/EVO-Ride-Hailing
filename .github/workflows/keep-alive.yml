@@ -1,0 +1,20 @@
+name: Keep Render Backend Awake 24/7
+
+on:
+  schedule:
+    # Runs every 5 minutes - prevents Render's 15-min sleep
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping EVO Backend Health
+        run: |
+          echo "🔄 Pinging backend to prevent Render sleep..."
+          curl -s --max-time 30 https://evo-backend-5zsg.onrender.com/health || echo "⏳ Ping sent (Render waking up)"
+      - name: Ping Admin API
+        run: |
+          echo "🔄 Pinging admin endpoint..."
+          curl -s --max-time 30 https://evo-backend-5zsg.onrender.com/api/v1/admin/login -X POST -H "Content-Type: application/json" -d '{"email":"admin@evo.jo","password":"123456"}' -o /dev/null -w "%{http_code}" || echo "⏳ Ping sent"
