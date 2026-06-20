@@ -325,7 +325,7 @@ export default function AdminsPage() {
                         <span className="text-gray-600">{timeAgo(log.created_at)}</span>
                       </div>
                       <p className="text-gray-400 truncate">
-                        {log.target_type}: {log.details?.substring(0, 60)}
+                        {log.target_type}: {typeof log.details === 'string' ? log.details.substring(0, 60) : JSON.stringify(log.details).substring(0, 60)}
                       </p>
                     </div>
                   ))}
