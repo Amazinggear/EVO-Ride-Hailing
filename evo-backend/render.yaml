@@ -12,6 +12,7 @@ services:
     region: frankfurt  # Closest to Jordan 🇯🇴
     plan: free
     healthCheckPath: /health
+    rootDir: evo-backend
     buildCommand: npm install
     startCommand: npm start
     # ⚡ Auto-deploy on push to main branch
