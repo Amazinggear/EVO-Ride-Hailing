@@ -121,11 +121,17 @@ adminRouter.post('/login', async (req, res) => {
   const { query } = require('../config/database');
   const { email, password } = req.body;
   
-  // For MVP, using a hardcoded password. In production, use bcrypt and store password_hash in users table.
-  if (password !== '123456') return res.status(401).json({ error: 'كلمة المرور أو البريد الإلكتروني غير صحيح' });
+  const { rows } = await query(
+    "SELECT id, full_name, role, admin_role, status, COALESCE(password_hash, '123456') as password_hash FROM users WHERE email = $1 AND role = 'admin'",
+    [email]
+  );
+  if (!rows[0] || rows[0].status === 'suspended') {
+    return res.status(401).json({ error: 'الحساب غير موجود أو موقوف' });
+  }
   
-  const { rows } = await query("SELECT id, full_name, role, admin_role, status FROM users WHERE email = $1 AND role = 'admin'", [email]);
-  if (!rows[0] || rows[0].status === 'suspended') return res.status(401).json({ error: 'الحساب غير موجود أو موقوف' });
+  if (password !== rows[0].password_hash) {
+    return res.status(401).json({ error: 'كلمة المرور أو البريد الإلكتروني غير صحيح' });
+  }
   
   await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [rows[0].id]);
   

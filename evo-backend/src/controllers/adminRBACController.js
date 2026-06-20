@@ -30,9 +30,9 @@ const createAdmin = async (req, res) => {
     const userPhone = phone || `ADMIN-${Date.now()}`;
 
     const { rows } = await query(
-      `INSERT INTO users (full_name, email, phone, role, admin_role, status)
-       VALUES ($1, $2, $3, 'admin', $4, 'active') RETURNING id, full_name, admin_role`,
-      [fullName, email, userPhone, adminRole]
+      `INSERT INTO users (full_name, email, phone, role, admin_role, status, password_hash)
+       VALUES ($1, $2, $3, 'admin', $4, 'active', $5) RETURNING id, full_name, admin_role`,
+      [fullName, email, userPhone, adminRole, password]
     );
 
     await query(

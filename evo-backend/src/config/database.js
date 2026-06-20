@@ -26,6 +26,20 @@ pool.on('error', (err) => {
 // Test connection removed for serverless compatibility
 
 // ────────────────────────────────────────────
+// Auto-migration: ensure password_hash column exists
+// ────────────────────────────────────────────
+const ensurePasswordHash = async () => {
+  try {
+    await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT");
+    await pool.query("UPDATE users SET password_hash = '123456' WHERE role = 'admin' AND password_hash IS NULL");
+    logger.info('✅ password_hash column ensured');
+  } catch (err) {
+    logger.warn('⚠️ password_hash migration skipped:', err.message);
+  }
+};
+ensurePasswordHash();
+
+// ────────────────────────────────────────────
 // Query Helper
 // ────────────────────────────────────────────
 const query = async (text, params) => {
