@@ -15,7 +15,7 @@ export default function AdminsPage() {
   const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ fullName: "", email: "", password: "", adminRole: "support" });
+  const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "", adminRole: "support" });
   const [formLoading, setFormLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -59,7 +59,7 @@ export default function AdminsPage() {
       const data = await res.json();
       if (res.ok) {
         setShowForm(false);
-        setForm({ fullName: "", email: "", password: "", adminRole: "support" });
+        setForm({ fullName: "", email: "", password: "", phone: "", adminRole: "support" });
         fetchAdmins();
       } else {
         setMessage(`❌ خطأ: ${data.error}`);
@@ -181,6 +181,10 @@ export default function AdminsPage() {
               <div>
                 <label className="block text-sm text-gray-400 mb-1.5 font-bold">كلمة المرور</label>
                 <input required type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full bg-[#0B0F19] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[var(--color-brand-500)] outline-none" dir="ltr" />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1.5 font-bold">رقم الهاتف (اختياري)</label>
+                <input type="text" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-[#0B0F19] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[var(--color-brand-500)] outline-none" dir="ltr" placeholder="07xxxxxxxx" />
               </div>
               <div>
                 <label className="block text-sm text-gray-400 mb-1.5 font-bold">الصلاحية (Role)</label>

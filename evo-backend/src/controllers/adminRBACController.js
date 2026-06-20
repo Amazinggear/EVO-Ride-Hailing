@@ -16,16 +16,23 @@ const listAdmins = async (req, res) => {
 
 const createAdmin = async (req, res) => {
   try {
-    const { fullName, email, phone, adminRole } = req.body;
+    const { fullName, email, phone, adminRole, password } = req.body;
     
     if (req.user.admin_role !== 'super_admin') {
       return res.status(403).json({ error: 'Only Super Admins can create new admins' });
     }
 
+    if (!password || password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Use provided phone or generate one (phone is required in DB but not in admin form)
+    const userPhone = phone || `ADMIN-${Date.now()}`;
+
     const { rows } = await query(
       `INSERT INTO users (full_name, email, phone, role, admin_role, status)
        VALUES ($1, $2, $3, 'admin', $4, 'active') RETURNING id, full_name, admin_role`,
-      [fullName, email, phone, adminRole]
+      [fullName, email, userPhone, adminRole]
     );
 
     await query(
