@@ -79,6 +79,7 @@ function WalletsContent() {
     } catch {
       console.error('Failed to fetch wallets');
       setWallets([]); // No mock in production
+    } finally {
       setLoading(false);
     }
   }, [showLowOnly]);

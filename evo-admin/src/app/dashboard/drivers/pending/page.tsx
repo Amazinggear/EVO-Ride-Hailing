@@ -52,6 +52,8 @@ export default function PendingDriversPage() {
     } catch {
       console.error('Failed to fetch pending drivers');
       setDrivers([]); // No mock in production
+    } finally {
+      setLoading(false);
     }
   }, []);
 

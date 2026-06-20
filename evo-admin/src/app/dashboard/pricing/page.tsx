@@ -62,7 +62,8 @@ export default function PricingPage() {
         headers: { "Bypass-Tunnel-Reminder": "true", Authorization: `Bearer ${getToken()}` },
       });
       if (!res.ok) throw new Error();
-      const data: PricingConfig[] = await res.json();
+      const json = await res.json();
+      const data: PricingConfig[] = json.pricing || json || [];
       const map: Record<string, PricingConfig> = {};
       const editMap: Record<string, EditableConfig> = {};
       data.forEach(p => {

@@ -98,11 +98,11 @@ export default function PromosPage() {
       })));
     } catch (err: any) {
       console.error('Fetch promos error:', err);
-      // 🚫 NEVER use mock data in production
       if (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_API_URL?.includes('onrender.com')) {
         console.warn('⚠️ Using MOCK_PROMOS fallback (dev mode only)');
         setPromos(MOCK_PROMOS);
       }
+    } finally {
       setLoading(false);
     }
   }, []);

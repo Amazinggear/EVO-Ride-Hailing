@@ -103,13 +103,13 @@ export default function DriversPage() {
       setDrivers(data.drivers || data || []);
     } catch (err: any) {
       console.error('Fetch drivers error:', err);
-      // 🚫 NEVER use mock data in production — only in local dev
       if (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_API_URL?.includes('onrender.com')) {
         console.warn('⚠️ Using MOCK_DRIVERS fallback (dev mode only)');
         setDrivers(MOCK_DRIVERS);
       } else {
         setError('تعذر الاتصال بالخادم. تأكد أن السيرفر يعمل على الرابط: ' + (process.env.NEXT_PUBLIC_API_URL || 'localhost:5000'));
       }
+    } finally {
       setLoading(false);
     }
   }, []);
