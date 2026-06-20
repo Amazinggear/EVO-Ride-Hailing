@@ -18,6 +18,7 @@ export default function AdminsPage() {
   const [form, setForm] = useState({ fullName: "", email: "", password: "", phone: "", adminRole: "support" });
   const [formLoading, setFormLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const getToken = () => localStorage.getItem("evo_admin_token") || "";
 
@@ -92,6 +93,27 @@ export default function AdminsPage() {
     }
   };
 
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
+    setDeleting(id);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/admins/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        fetchAdmins();
+      } else {
+        alert(data.error || "فشل الحذف");
+      }
+    } catch (err) {
+      alert("فشل الاتصال بالخادم");
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   const ROLE_LABELS: Record<string, string> = {
     super_admin: "Super Admin (مدير عام)",
     operations: "Operations (عمليات)",
@@ -133,6 +155,7 @@ export default function AdminsPage() {
                   <th className="px-4 py-3 text-right text-gray-500 font-bold">البريد الإلكتروني</th>
                   <th className="px-4 py-3 text-right text-gray-500 font-bold">الصلاحية</th>
                   <th className="px-4 py-3 text-center text-gray-500 font-bold">تاريخ الإضافة</th>
+                  <th className="px-4 py-3 text-center text-gray-500 font-bold">حذف</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -151,6 +174,16 @@ export default function AdminsPage() {
                     </td>
                     <td className="px-4 py-4 text-center text-gray-500 text-xs font-cy-bold">
                       {new Date(admin.created_at).toLocaleDateString("ar-EG-u-nu-latn")}
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <button
+                        onClick={() => handleDelete(admin.id, admin.full_name)}
+                        disabled={deleting === admin.id}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-2 py-1 text-xs font-bold transition-colors disabled:opacity-50"
+                        title="حذف"
+                      >
+                        {deleting === admin.id ? "⏳" : "🗑️"}
+                      </button>
                     </td>
                   </tr>
                 ))}

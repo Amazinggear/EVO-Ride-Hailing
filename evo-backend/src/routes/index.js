@@ -19,7 +19,7 @@ const {
 } = require('../controllers/walletController');
 const { getComplaints, updateComplaintStatus, assignComplaint } = require('../controllers/complaintsController');
 const { sendMassNotification, getNotificationHistory } = require('../controllers/notificationsController');
-const { listAdmins, createAdmin, updateAdminRole } = require('../controllers/adminRBACController');
+const { listAdmins, createAdmin, updateAdminRole, deleteAdmin } = require('../controllers/adminRBACController');
 
 const router = express.Router();
 
@@ -329,6 +329,7 @@ adminRouter.get('/notifications/history', getNotificationHistory);
 adminRouter.get('/admins', listAdmins);
 adminRouter.post('/admins', createAdmin);
 adminRouter.patch('/admins/:id/role', updateAdminRole);
+adminRouter.delete('/admins/:id', deleteAdmin);
 
 // Backup
 adminRouter.get('/backup/export', async (req, res) => {

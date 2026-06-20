@@ -82,4 +82,50 @@ const updateAdminRole = async (req, res) => {
   }
 };
 
-module.exports = { listAdmins, createAdmin, updateAdminRole };
+const deleteAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (req.user.admin_role !== 'super_admin') {
+      return res.status(403).json({ error: 'Only Super Admins can delete admins' });
+    }
+
+    // Don't allow self-deletion
+    if (id === req.user.id) {
+      return res.status(400).json({ error: 'Cannot delete your own account' });
+    }
+
+    const { rows: adminRows } = await query(
+      "SELECT id, full_name, admin_role FROM users WHERE id = $1 AND role = 'admin'",
+      [id]
+    );
+    if (!adminRows[0]) {
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+
+    // Don't allow deleting the last super_admin
+    if (adminRows[0].admin_role === 'super_admin') {
+      const { rows: superCount } = await query(
+        "SELECT COUNT(*) as count FROM users WHERE admin_role = 'super_admin' AND role = 'admin'"
+      );
+      if (parseInt(superCount[0].count) <= 1) {
+        return res.status(400).json({ error: 'Cannot delete the last Super Admin' });
+      }
+    }
+
+    await query("DELETE FROM users WHERE id = $1 AND role = 'admin'", [id]);
+
+    await query(
+      `INSERT INTO admin_audit_logs (admin_id, action, target_type, target_id, details)
+       VALUES ($1, 'delete_admin', 'user', $2, $3)`,
+      [req.user.id, id, JSON.stringify({ fullName: adminRows[0].full_name, adminRole: adminRows[0].admin_role })]
+    );
+
+    return res.json({ success: true, message: `Admin ${adminRows[0].full_name} removed` });
+  } catch (err) {
+    logger.error('deleteAdmin error:', err.message);
+    return res.status(500).json({ error: 'Failed to delete admin' });
+  }
+};
+
+module.exports = { listAdmins, createAdmin, updateAdminRole, deleteAdmin };
