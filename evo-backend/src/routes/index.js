@@ -422,6 +422,21 @@ adminRouter.post('/admins', gate('super_admin'), createAdmin);
 adminRouter.patch('/admins/:id/role', gate('super_admin'), updateAdminRole);
 adminRouter.delete('/admins/:id', gate('super_admin'), deleteAdmin);
 
+// Admin activity tracking — ping endpoint
+adminRouter.post('/activity/ping', async (req, res) => {
+  const { query } = require('../config/database');
+  try {
+    const { page } = req.body;
+    await query(
+      "INSERT INTO admin_activity (admin_id, page) VALUES ($1, $2)",
+      [req.user.id, page || '/']
+    );
+    return res.json({ ok: true });
+  } catch {
+    return res.json({ ok: false });
+  }
+});
+
 // Backup
 adminRouter.get('/backup/export', async (req, res) => {
   const { performBackup } = require('../utils/backupService');

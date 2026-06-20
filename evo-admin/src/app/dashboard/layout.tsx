@@ -97,6 +97,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [profile.adminRole, pathname]);
 
+  // Activity ping — track admin page visits for working hours
+  useEffect(() => {
+    const token = localStorage.getItem("evo_admin_token");
+    if (!token || !pathname) return;
+    const ping = () => {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/activity/ping`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ page: pathname }),
+      }).catch(() => {});
+    };
+    ping(); // initial ping
+    const interval = setInterval(ping, 60000); // every 1 minute
+    return () => clearInterval(interval);
+  }, [pathname]);
+
   useEffect(() => {
     if (isProfileModalOpen) {
       setEditName(profile.fullName);

@@ -9,6 +9,10 @@ interface AdminUser {
   admin_role: string;
   created_at: string;
   status: string;
+  last_login_at?: string;
+  total_hours?: number;
+  total_visits?: number;
+  last_seen?: string;
 }
 
 export default function AdminsPage() {
@@ -121,6 +125,16 @@ export default function AdminsPage() {
     support: "Support (دعم فني)",
   };
 
+  const timeAgo = (date?: string) => {
+    if (!date) return '—';
+    const diff = Math.floor((Date.now() - new Date(date).getTime()) / 60000);
+    if (diff < 1) return 'الآن';
+    if (diff < 60) return `${diff}د`;
+    const h = Math.floor(diff / 60);
+    if (h < 24) return `${h}س`;
+    return `${Math.floor(h / 24)} يوم`;
+  };
+
   return (
     <>
       <div dir="rtl" className="space-y-6 animate-fade-in-up">
@@ -155,6 +169,8 @@ export default function AdminsPage() {
                   <th className="px-4 py-3 text-right text-gray-500 font-bold">البريد الإلكتروني</th>
                   <th className="px-4 py-3 text-right text-gray-500 font-bold">الصلاحية</th>
                   <th className="px-4 py-3 text-center text-gray-500 font-bold">تاريخ الإضافة</th>
+                  <th className="px-4 py-3 text-center text-gray-500 font-bold">ساعات العمل</th>
+                  <th className="px-4 py-3 text-center text-gray-500 font-bold">آخر نشاط</th>
                   <th className="px-4 py-3 text-center text-gray-500 font-bold">حذف</th>
                 </tr>
               </thead>
@@ -174,6 +190,12 @@ export default function AdminsPage() {
                     </td>
                     <td className="px-4 py-4 text-center text-gray-500 text-xs font-cy-bold">
                       {new Date(admin.created_at).toLocaleDateString("ar-EG-u-nu-latn")}
+                    </td>
+                    <td className="px-4 py-4 text-center text-white font-cy-bold text-xs">
+                      {admin.total_hours ? `${admin.total_hours} س` : '—'}
+                    </td>
+                    <td className="px-4 py-4 text-center text-gray-400 text-xs font-bold">
+                      {timeAgo(admin.last_seen)}
                     </td>
                     <td className="px-4 py-4 text-center">
                       <button

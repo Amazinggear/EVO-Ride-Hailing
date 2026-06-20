@@ -55,7 +55,18 @@ const runMigration = async () => {
     await pool.query("CREATE INDEX IF NOT EXISTS idx_driver_sessions_status ON driver_sessions(status)");
     // Unique onboarding token for each driver
     await pool.query("ALTER TABLE driver_profiles ADD COLUMN IF NOT EXISTS onboarding_token TEXT UNIQUE");
-    logger.info('✅ Migrations v5 applied: registered_by, driver_sessions, onboarding_token');
+    // Admin activity tracking (working hours, last page visit)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_activity (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        admin_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        page VARCHAR(100),
+        duration_seconds INT DEFAULT 0,
+        visited_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    await pool.query("CREATE INDEX IF NOT EXISTS idx_admin_activity_admin ON admin_activity(admin_id)");
+    logger.info('✅ Migrations v5 applied: registered_by, driver_sessions, onboarding_token, admin_activity');
   } catch (err) {
     logger.warn('⚠️ Migration v5 skipped:', err.message);
   }

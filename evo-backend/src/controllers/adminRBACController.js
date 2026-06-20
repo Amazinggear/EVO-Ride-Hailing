@@ -4,10 +4,29 @@ const logger = require('../utils/logger');
 const listAdmins = async (req, res) => {
   try {
     const { rows } = await query(
-      `SELECT id, full_name, email, phone, role, admin_role, status, last_login_at, created_at 
-       FROM users WHERE role = 'admin' ORDER BY created_at DESC`
+      `SELECT u.id, u.full_name, u.email, u.phone, u.role, u.admin_role, u.status, u.last_login_at, u.created_at,
+              COALESCE(act.total_visits, 0) as total_page_visits,
+              COALESCE(act.total_seconds, 0) as total_seconds,
+              act.last_activity as last_page_visit
+       FROM users u
+       LEFT JOIN (
+         SELECT admin_id,
+                COUNT(*) as total_visits,
+                COALESCE(SUM(duration_seconds), 0) as total_seconds,
+                MAX(visited_at) as last_activity
+         FROM admin_activity
+         GROUP BY admin_id
+       ) act ON act.admin_id = u.id
+       WHERE u.role = 'admin'
+       ORDER BY u.created_at DESC`
     );
-    return res.json({ admins: rows });
+    const admins = rows.map(r => ({
+      ...r,
+      total_hours: Math.round((parseInt(r.total_seconds) || 0) / 36) / 100, // seconds → hours with 2 decimals
+      total_visits: parseInt(r.total_page_visits) || 0,
+      last_seen: r.last_page_visit || r.last_login_at,
+    }));
+    return res.json({ admins });
   } catch (err) {
     logger.error('listAdmins error:', err.message);
     return res.status(500).json({ error: 'Failed to fetch admins' });
@@ -23,11 +42,22 @@ const createAdmin = async (req, res) => {
     }
 
     if (!password || password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+      return res.status(400).json({ error: 'يجب أن تكون كلمة المرور 6 أحرف على الأقل' });
     }
 
-    // Use provided phone or generate one (phone is required in DB but not in admin form)
-    const userPhone = phone || `ADMIN-${Date.now()}`;
+    if (!fullName || !email) {
+      return res.status(400).json({ error: 'الاسم والبريد الإلكتروني مطلوبان' });
+    }
+
+    // Check if email already exists
+    const { rows: existing } = await query('SELECT id FROM users WHERE email = $1', [email]);
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'البريد الإلكتروني مستخدم مسبقاً' });
+    }
+
+    // Use provided phone or generate a unique one
+    const crypto = require('crypto');
+    const userPhone = phone || `09${crypto.randomBytes(4).toString('hex')}`;
 
     const { rows } = await query(
       `INSERT INTO users (full_name, email, phone, role, admin_role, status, password_hash)
@@ -43,10 +73,14 @@ const createAdmin = async (req, res) => {
 
     return res.status(201).json({ success: true, admin: rows[0] });
   } catch (err) {
+    logger.error('createAdmin error:', err.message, err.stack);
     if (err.message.includes('unique_phone')) {
-      return res.status(400).json({ error: 'Phone number already exists' });
+      return res.status(400).json({ error: 'رقم الهاتف مستخدم مسبقاً' });
     }
-    return res.status(500).json({ error: 'Failed to create admin' });
+    if (err.message.includes('unique_email') || err.constraint === 'users_email_key') {
+      return res.status(400).json({ error: 'البريد الإلكتروني مستخدم مسبقاً' });
+    }
+    return res.status(500).json({ error: 'فشل إنشاء الموظف. تأكد من صحة البيانات المدخلة.' });
   }
 };
 
