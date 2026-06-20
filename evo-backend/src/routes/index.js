@@ -141,32 +141,40 @@ adminRouter.post('/login', async (req, res) => {
   return res.json({ accessToken: token, user: rows[0] });
 });
 
-adminRouter.use(authenticate, requireRole('admin', 'super_admin', 'operations', 'finance', 'support'));
+// ────────────────────────────────────────────
+// Role-based access: which admin_role can access which route groups
+// ────────────────────────────────────────────
+const ALL_ADMIN_ROLES = ['super_admin', 'operations', 'finance', 'support'];
+
+adminRouter.use(authenticate, requireRole('admin'));
+
+// Helper: gate routes to specific admin roles (super_admin always passes)
+const gate = (...roles) => requireRole('super_admin', ...roles);
 
 adminRouter.get('/dashboard/stats', adminController.getDashboardStats);
 adminRouter.get('/stats', adminController.getDashboardStats); // alias
 
 // Users
-adminRouter.get('/users', adminController.listUsers);
-adminRouter.get('/users/:id', adminController.getUserDetails);
-adminRouter.patch('/users/:id/status', adminController.updateUserStatus);
+adminRouter.get('/users', gate('operations', 'support'), adminController.listUsers);
+adminRouter.get('/users/:id', gate('operations', 'support'), adminController.getUserDetails);
+adminRouter.patch('/users/:id/status', gate('operations', 'support'), adminController.updateUserStatus);
 
 // Driver Approval
-adminRouter.get('/drivers/pending', getPendingDrivers);
-adminRouter.get('/drivers/:id/documents', adminController.getDriverDocuments);
-adminRouter.post('/drivers/:id/approve', approveDriver);
-adminRouter.post('/drivers/:id/reject', rejectDriver);
-adminRouter.post('/drivers/:id/request-info', requestMoreInfo);
+adminRouter.get('/drivers/pending', gate('operations'), getPendingDrivers);
+adminRouter.get('/drivers/:id/documents', gate('operations'), adminController.getDriverDocuments);
+adminRouter.post('/drivers/:id/approve', gate('operations'), approveDriver);
+adminRouter.post('/drivers/:id/reject', gate('operations'), rejectDriver);
+adminRouter.post('/drivers/:id/request-info', gate('operations'), requestMoreInfo);
 
 // Captain Management (Create/Delete)
-adminRouter.post('/drivers', adminController.createDriver);
-adminRouter.delete('/drivers/:id', adminController.deleteDriver);
+adminRouter.post('/drivers', gate('operations'), adminController.createDriver);
+adminRouter.delete('/drivers/:id', gate('operations'), adminController.deleteDriver);
 
 // Live tracking
-adminRouter.get('/rides/live', adminController.getLiveRides);
+adminRouter.get('/rides/live', gate('operations'), adminController.getLiveRides);
 
 // Admin rides list (paginated)
-adminRouter.get('/rides', async (req, res) => {
+adminRouter.get('/rides', gate('operations'), async (req, res) => {
   const { query } = require('../config/database');
   try {
     const { status, from, to, page = 1, limit = 20 } = req.query;
@@ -233,7 +241,7 @@ adminRouter.get('/rides', async (req, res) => {
 });
 
 // Admin drivers list
-adminRouter.get('/drivers', async (req, res) => {
+adminRouter.get('/drivers', gate('operations'), async (req, res) => {
   const { query } = require('../config/database');
   try {
     const { status, search } = req.query;
@@ -290,52 +298,52 @@ adminRouter.get('/drivers', async (req, res) => {
 });
 
 // Pricing
-adminRouter.get('/pricing', adminController.getPricing);
-adminRouter.patch('/pricing/:carType', adminController.updatePricing);
+adminRouter.get('/pricing', gate('finance'), adminController.getPricing);
+adminRouter.patch('/pricing/:carType', gate('finance'), adminController.updatePricing);
 
 // Surge zones
-adminRouter.get('/surge-zones', adminController.getSurgeZones);
-adminRouter.post('/surge-zones', adminController.createSurgeZone);
-adminRouter.patch('/surge-zones/:id', adminController.updateSurgeZone);
+adminRouter.get('/surge-zones', gate('operations'), adminController.getSurgeZones);
+adminRouter.post('/surge-zones', gate('operations'), adminController.createSurgeZone);
+adminRouter.patch('/surge-zones/:id', gate('operations'), adminController.updateSurgeZone);
 
 // Promo codes
-adminRouter.get('/promo-codes', adminController.listPromoCodes);
-adminRouter.post('/promo-codes', adminController.createPromoCode);
-adminRouter.patch('/promo-codes/:id', adminController.updatePromoCode);
-adminRouter.delete('/promo-codes/:id', adminController.deletePromoCode);
+adminRouter.get('/promo-codes', gate('finance'), adminController.listPromoCodes);
+adminRouter.post('/promo-codes', gate('finance'), adminController.createPromoCode);
+adminRouter.patch('/promo-codes/:id', gate('finance'), adminController.updatePromoCode);
+adminRouter.delete('/promo-codes/:id', gate('finance'), adminController.deletePromoCode);
 
 // Wallet Management (Admin recharges driver wallets by plate number)
-adminRouter.post('/wallet/recharge', adminRechargeWallet);
-adminRouter.get('/wallet/balances', adminGetAllBalances);
-adminRouter.get('/wallet/history/:driverId', adminGetDriverHistory);
+adminRouter.post('/wallet/recharge', gate('finance'), adminRechargeWallet);
+adminRouter.get('/wallet/balances', gate('finance'), adminGetAllBalances);
+adminRouter.get('/wallet/history/:driverId', gate('finance'), adminGetDriverHistory);
 
 // Charging stations
-adminRouter.get('/charging-stations', chargingController.adminListAllStations);
-adminRouter.post('/charging-stations', chargingController.adminAddStation);
-adminRouter.patch('/charging-stations/:id', chargingController.adminUpdateStation);
-adminRouter.delete('/charging-stations/:id', chargingController.adminDeleteStation);
-adminRouter.post('/charging-stations/sync', chargingController.adminSyncFromOCM);
+adminRouter.get('/charging-stations', gate('operations'), chargingController.adminListAllStations);
+adminRouter.post('/charging-stations', gate('operations'), chargingController.adminAddStation);
+adminRouter.patch('/charging-stations/:id', gate('operations'), chargingController.adminUpdateStation);
+adminRouter.delete('/charging-stations/:id', gate('operations'), chargingController.adminDeleteStation);
+adminRouter.post('/charging-stations/sync', gate('operations'), chargingController.adminSyncFromOCM);
 
 // Financials
-adminRouter.get('/financials/summary', adminController.getFinancialSummary);
-adminRouter.get('/financials/transactions', adminController.getAllTransactions);
+adminRouter.get('/financials/summary', gate('finance'), adminController.getFinancialSummary);
+adminRouter.get('/financials/transactions', gate('finance'), adminController.getAllTransactions);
 // ❌ REMOVED: /payouts/process (no bank payouts)
-adminRouter.get('/audit-logs', adminController.getAuditLogs);
+adminRouter.get('/audit-logs', gate('support'), adminController.getAuditLogs);
 
 // Complaints
-adminRouter.get('/complaints', getComplaints);
-adminRouter.patch('/complaints/:id/status', updateComplaintStatus);
-adminRouter.patch('/complaints/:id/assign', assignComplaint);
+adminRouter.get('/complaints', gate('support'), getComplaints);
+adminRouter.patch('/complaints/:id/status', gate('support'), updateComplaintStatus);
+adminRouter.patch('/complaints/:id/assign', gate('support'), assignComplaint);
 
 // Notifications
-adminRouter.post('/notifications/send', sendMassNotification);
-adminRouter.get('/notifications/history', getNotificationHistory);
+adminRouter.post('/notifications/send', gate('support'), sendMassNotification);
+adminRouter.get('/notifications/history', gate('support'), getNotificationHistory);
 
-// Admin Management (RBAC)
-adminRouter.get('/admins', listAdmins);
-adminRouter.post('/admins', createAdmin);
-adminRouter.patch('/admins/:id/role', updateAdminRole);
-adminRouter.delete('/admins/:id', deleteAdmin);
+// Admin Management (RBAC) — super_admin only
+adminRouter.get('/admins', gate('super_admin'), listAdmins);
+adminRouter.post('/admins', gate('super_admin'), createAdmin);
+adminRouter.patch('/admins/:id/role', gate('super_admin'), updateAdminRole);
+adminRouter.delete('/admins/:id', gate('super_admin'), deleteAdmin);
 
 // Backup
 adminRouter.get('/backup/export', async (req, res) => {

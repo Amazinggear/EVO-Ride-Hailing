@@ -5,25 +5,25 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import EvoLogo from "@/components/EvoLogo";
 
-const MENU_ITEMS = [
-  { href: "/dashboard", icon: "📊", label: "الرئيسية" },
-  { href: "/dashboard/live", icon: "🗺️", label: "التتبع المباشر" },
-  { href: "/dashboard/customers", icon: "👥", label: "العملاء" },
-  { href: "/dashboard/drivers", icon: "🚗", label: "الكباتن" },
-  { href: "/dashboard/drivers/pending", icon: "⏳", label: "الاعتمادات" },
-  { href: "/dashboard/rides", icon: "📍", label: "الرحلات" },
+const ALL_MENU_ITEMS = [
+  { href: "/dashboard", icon: "📊", label: "الرئيسية", roles: ["super_admin", "operations", "finance", "support"] },
+  { href: "/dashboard/live", icon: "🗺️", label: "التتبع المباشر", roles: ["super_admin", "operations"] },
+  { href: "/dashboard/customers", icon: "👥", label: "العملاء", roles: ["super_admin", "operations", "support"] },
+  { href: "/dashboard/drivers", icon: "🚗", label: "الكباتن", roles: ["super_admin", "operations"] },
+  { href: "/dashboard/drivers/pending", icon: "⏳", label: "الاعتمادات", roles: ["super_admin", "operations"] },
+  { href: "/dashboard/rides", icon: "📍", label: "الرحلات", roles: ["super_admin", "operations"] },
 ];
 
-const GENERAL_ITEMS = [
-  { href: "/dashboard/complaints", icon: "🚨", label: "الشكاوى" },
-  { href: "/dashboard/notifications", icon: "📢", label: "الإشعارات" },
-  { href: "/dashboard/wallets", icon: "💰", label: "المحافظ" },
-  { href: "/dashboard/promos", icon: "🎟️", label: "الخصومات" },
-  { href: "/dashboard/pricing", icon: "⚙️", label: "الأسعار" },
-  { href: "/dashboard/stations", icon: "⚡", label: "محطات الشحن" },
-  { href: "/dashboard/financials", icon: "📈", label: "التقارير المالية" },
-  { href: "/dashboard/audit", icon: "🔍", label: "سجل التدقيق" },
-  { href: "/dashboard/admins", icon: "🛡️", label: "الصلاحيات" },
+const ALL_GENERAL_ITEMS = [
+  { href: "/dashboard/complaints", icon: "🚨", label: "الشكاوى", roles: ["super_admin", "support"] },
+  { href: "/dashboard/notifications", icon: "📢", label: "الإشعارات", roles: ["super_admin", "support"] },
+  { href: "/dashboard/wallets", icon: "💰", label: "المحافظ", roles: ["super_admin", "finance"] },
+  { href: "/dashboard/promos", icon: "🎟️", label: "الخصومات", roles: ["super_admin", "finance"] },
+  { href: "/dashboard/pricing", icon: "⚙️", label: "الأسعار", roles: ["super_admin", "finance"] },
+  { href: "/dashboard/stations", icon: "⚡", label: "محطات الشحن", roles: ["super_admin", "operations"] },
+  { href: "/dashboard/financials", icon: "📈", label: "التقارير المالية", roles: ["super_admin", "finance"] },
+  { href: "/dashboard/audit", icon: "🔍", label: "سجل التدقيق", roles: ["super_admin", "support"] },
+  { href: "/dashboard/admins", icon: "🛡️", label: "الصلاحيات", roles: ["super_admin"] },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -86,6 +86,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  // Route protection: redirect if role doesn't have access to current page
+  useEffect(() => {
+    if (!profile.adminRole) return;
+    const allItems = [...ALL_MENU_ITEMS, ...ALL_GENERAL_ITEMS];
+    const currentItem = allItems.find(item => pathname === item.href || pathname?.startsWith(item.href + '/'));
+    if (currentItem && !currentItem.roles.includes(profile.adminRole)) {
+      router.push("/dashboard");
+    }
+  }, [profile.adminRole, pathname]);
 
   useEffect(() => {
     if (isProfileModalOpen) {
@@ -226,7 +236,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div>
             <div className="px-8 mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">القائمة الأساسية</div>
             <nav className="flex flex-col gap-1">
-              {MENU_ITEMS.map((item) => (
+              {ALL_MENU_ITEMS.filter(item => item.roles.includes(profile.adminRole || 'support')).map((item) => (
                 <NavItem key={item.href} {...item} />
               ))}
             </nav>
@@ -236,7 +246,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div>
             <div className="px-8 mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">عام</div>
             <nav className="flex flex-col gap-1">
-              {GENERAL_ITEMS.map((item) => (
+              {ALL_GENERAL_ITEMS.filter(item => item.roles.includes(profile.adminRole || 'support')).map((item) => (
                 <NavItem key={item.href} {...item} />
               ))}
             </nav>
