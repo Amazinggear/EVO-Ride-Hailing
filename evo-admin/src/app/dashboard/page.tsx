@@ -195,8 +195,7 @@ export default function DashboardHome() {
               </div>
             </div>
             <h2 className="text-[2rem] font-cy-bold leading-none mb-4 tracking-tight drop-shadow-sm flex items-center gap-1 text-white">
-              <span className="text-xl text-[var(--color-brand-500)]">$</span>
-              {(stats?.totalRevenueToday ?? 125514.99).toLocaleString('en-US')}
+              {(stats?.totalRevenueToday ?? 0).toFixed(2)} <span className="text-lg text-gray-500">د.أ</span>
             </h2>
             <div className="inline-flex items-center gap-1.5 bg-[var(--color-brand-500)]/10 border border-[var(--color-brand-500)]/20 text-[var(--color-brand-500)] text-xs px-3 py-1.5 rounded-full w-fit">
               <span className="font-cy-bold">↑</span> <span className="font-cy-bold">+5%</span> من الشهر الماضي
@@ -213,7 +212,7 @@ export default function DashboardHome() {
             </div>
           </div>
           <h2 className="text-[2rem] font-cy-bold text-white leading-none mb-4 tracking-tight flex items-baseline gap-2">
-            {stats?.totalRidesToday ?? 31} <span className="text-sm text-gray-500 font-bold font-alexandria">رحلة</span>
+            {stats?.totalRidesToday ?? 0} <span className="text-sm text-gray-500 font-bold font-alexandria">رحلة</span>
           </h2>
           <div className="inline-flex items-center gap-1.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 font-medium text-xs px-3 py-1.5 rounded-full w-fit">
             <span className="font-cy-bold">↑</span> <span className="font-cy-bold">+3%</span> زيادة عن الشهر الماضي
@@ -229,10 +228,10 @@ export default function DashboardHome() {
             </div>
           </div>
           <h2 className="text-[2rem] font-cy-bold text-white leading-none mb-4 tracking-tight">
-            {stats?.activeDrivers ?? 12}
+            {stats?.activeDrivers ?? 0}
           </h2>
           <div className="inline-flex items-center gap-1.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 font-medium text-xs px-3 py-1.5 rounded-full w-fit">
-            <span className="font-cy-bold">↑</span> <span className="font-cy-bold">+6%</span> زيادة عن الشهر الماضي
+            <span className="font-cy-bold">●</span> متصل الآن
           </div>
         </div>
 
@@ -247,7 +246,7 @@ export default function DashboardHome() {
               </div>
             </div>
             <h2 className="text-[2rem] font-cy-bold text-white leading-none mb-4 tracking-tight">
-              {stats?.pendingApprovals ?? 2}
+              {stats?.pendingApprovals ?? 0}
             </h2>
             <div className="inline-flex items-center gap-1.5 bg-orange-500/10 text-orange-400 border border-orange-500/20 font-medium text-xs px-3 py-1.5 rounded-full w-fit">
               <span className="font-cy-bold">↑</span> بانتظار الموافقة
@@ -256,308 +255,12 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* CHARTS & REPORTS */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Sales Summary Chart */}
-        <div className="lg:col-span-2 bg-[var(--color-card)] rounded-3xl p-6 border border-white/5 shadow-lg">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h3 className="font-bold text-white mb-1">ملخص الإيرادات</h3>
-              <p className="text-[var(--color-brand-500)] font-cy-bold text-sm">$1,804.55</p>
-            </div>
-            <div className="flex gap-2 bg-[#0B0F19] p-1 rounded-full border border-white/5">
-              <button className="px-3 py-1 rounded-full text-xs font-bold bg-[var(--color-brand-500)] text-white shadow-[0_0_10px_rgba(0,200,83,0.3)]">يوم</button>
-              <button className="px-3 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-colors">أسبوع</button>
-              <button className="px-3 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-colors">شهر</button>
-              <button className="px-3 py-1 rounded-full text-xs font-bold text-gray-400 hover:text-white transition-colors">سنة</button>
-            </div>
-          </div>
-          
-          <div className="h-[250px] w-full" dir="ltr">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fill: '#6B7280', fontSize: 12, fontWeight: 500, fontFamily: 'var(--font-alexandria)' }}
-                  dy={10}
-                />
-                <Bar 
-                  dataKey="uv" 
-                  radius={[8, 8, 8, 8]} 
-                  barSize={40}
-                >
-                  {data.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={index === 2 ? "url(#diagonalHatch)" : "var(--color-brand-900)"} 
-                    />
-                  ))}
-                </Bar>
-                <defs>
-                  <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="8" height="8">
-                    <rect width="8" height="8" fill="var(--color-brand-900)"/>
-                    <path d="M-2,2 l4,-4 M0,8 l8,-8 M6,10 l4,-4" stroke="var(--color-brand-500)" strokeWidth="1.5"/>
-                  </pattern>
-                </defs>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="flex justify-between items-center mt-2 text-xs text-gray-500 font-cy-bold">
-            <span>October, 2024</span>
-            <span>September, 2024</span>
-          </div>
-        </div>
-
-        {/* Reports List */}
-        <div className="bg-[var(--color-card)] rounded-3xl p-6 border border-white/5 shadow-lg flex flex-col">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-white">التقارير السريعة</h3>
-            <button 
-              onClick={() => setIsAddReportOpen(true)}
-              className="text-xs font-bold text-gray-300 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 hover:bg-white/10 hover:border-[var(--color-brand-500)]/45 transition-colors cursor-pointer"
-            >
-              + جديد
-            </button>
-          </div>
-          
-          <div className="flex flex-col gap-3 max-h-[310px] overflow-y-auto custom-scrollbar">
-            {reports.map((report, i) => (
-              <div 
-                key={i} 
-                onClick={() => setSelectedReport(report)}
-                className={`bg-gradient-to-r ${report.accent} border border-r-4 rounded-xl p-4 flex justify-between items-center group cursor-pointer hover:bg-white/5 transition-all bg-[#0B0F19]`}
-              >
-                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white group-hover:bg-white/10 transition-colors font-cy-bold">
-                  ↖
-                </div>
-                <div className="text-left">
-                  <h4 className="font-bold text-white text-sm mb-1">{report.title}</h4>
-                  <p className="text-xs text-gray-400 font-cy-bold">{report.date}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* PLACEHOLDER — real charts when rides start */}
+      <div className="bg-card rounded-3xl p-8 border border-white/5 shadow-lg text-center">
+        <div className="text-5xl mb-4">📊</div>
+        <h3 className="text-white font-bold text-lg mb-2">الرسوم البيانية والتقارير</h3>
+        <p className="text-gray-400 text-sm">ستظهر المخططات فور بدء استقبال الرحلات.</p>
       </div>
-
-      {/* BOTTOM ROW */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Payments Table */}
-        <div className="lg:col-span-2 bg-[var(--color-card)] rounded-3xl p-6 border border-white/5 shadow-lg overflow-hidden flex flex-col">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-bold text-white">أحدث العمليات</h3>
-            <div className="relative">
-              <button 
-                onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen)}
-                className="text-xs font-bold text-gray-300 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 hover:bg-white/10 transition-colors flex items-center gap-2 cursor-pointer"
-              >
-                تصفية: <span className="font-cy-bold text-[var(--color-brand-500)]">{operationsFilter === "all" ? "الكل" : operationsFilter === "completed" ? "مكتمل" : operationsFilter === "processing" ? "قيد التنفيذ" : "معلق"}</span>
-              </button>
-              {isFilterDropdownOpen && (
-                <>
-                  <div className="fixed inset-0 z-40" onClick={() => setIsFilterDropdownOpen(false)} />
-                  <div className="absolute left-0 mt-2 w-36 bg-[#0B0F19] border border-white/10 rounded-xl p-2 shadow-2xl z-50 text-right">
-                    {[
-                      { key: "all", label: "الكل" },
-                      { key: "completed", label: "مكتمل" },
-                      { key: "processing", label: "قيد التنفيذ" },
-                      { key: "pending", label: "معلق" }
-                    ].map(opt => (
-                      <button
-                        key={opt.key}
-                        onClick={() => { setOperationsFilter(opt.key); setIsFilterDropdownOpen(false); }}
-                        className={`w-full text-right px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                          operationsFilter === opt.key 
-                            ? "bg-[var(--color-brand-500)]/10 text-[var(--color-brand-500)]" 
-                            : "text-gray-400 hover:bg-white/5 hover:text-white"
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-right">
-              <thead>
-                <tr className="text-gray-500 font-medium border-b border-white/5">
-                  <th className="pb-3 px-2 font-normal">التاريخ</th>
-                  <th className="pb-3 px-2 font-normal text-center">المبلغ</th>
-                  <th className="pb-3 px-2 font-normal text-center">الخصم</th>
-                  <th className="pb-3 px-2 font-normal text-center">الحالة</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-300 font-medium">
-                {filteredOperations.map((row, i) => (
-                  <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
-                    <td className="py-3 px-2 flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-white/5 text-gray-300 flex items-center justify-center font-cy-bold text-xs mt-1 border border-white/10">
-                        {row.l}
-                      </div>
-                      <span className="font-cy-bold">{row.date}</span>
-                    </td>
-                    <td className="py-3 px-2 text-center font-cy-bold">{row.cash}</td>
-                    <td className="py-3 px-2 text-center text-gray-500 font-cy-bold">{row.round}</td>
-                    <td className="py-3 px-2 text-center">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold border ${row.sc}`}>
-                        {row.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {filteredOperations.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="py-8 text-center text-gray-500 font-bold text-xs">لا توجد عمليات تطابق التصفية</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Calendar Widget */}
-        <div className="bg-[var(--color-card)] rounded-3xl p-6 border border-white/5 shadow-lg relative overflow-hidden">
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[var(--color-brand-500)]/5 blur-[50px] rounded-full"></div>
-          <div className="relative z-10">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h4 className="text-gray-400 font-bold text-sm">مبيعات الشهر الحالي</h4>
-                <h2 className="text-2xl font-cy-bold text-white tracking-tight mt-1">$329,728.45</h2>
-                <p className="text-xs text-gray-500 mt-1 font-cy-bold">October 2024</p>
-              </div>
-              <div className="text-left text-xs space-y-1">
-                <p className="text-gray-500 font-cy-bold"><span className="inline-block w-12 font-alexandria text-gray-400">التاريخ:</span> <span className="font-cy-bold text-white">Oct 17, 2024</span></p>
-                <p className="text-gray-500 font-cy-bold"><span className="inline-block w-12 font-alexandria text-gray-400">القيمة:</span> <span className="font-cy-bold text-[var(--color-brand-500)]">$18,434.76</span></p>
-              </div>
-            </div>
-            
-            {/* Simple Mock Calendar */}
-            <div className="grid grid-cols-7 text-center gap-y-3 mt-4 text-sm font-medium font-cy-bold" dir="ltr">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
-                <div key={d} className="text-gray-500 text-xs">{d}</div>
-              ))}
-              {/* Empty days */}
-              <div className="text-gray-700">27</div><div className="text-gray-700">28</div><div className="text-gray-700">29</div><div className="text-gray-700">30</div><div className="text-gray-700">31</div>
-              {/* Active days */}
-              <div className="text-gray-300">01</div><div className="text-gray-300">02</div>
-              <div className="text-gray-300">03</div><div className="text-gray-300">04</div><div className="text-gray-300">05</div><div className="text-gray-300">06</div><div className="text-gray-300">07</div><div className="text-gray-300">08</div><div className="text-gray-300">09</div>
-              <div className="text-gray-300">10</div><div className="text-gray-300">11</div><div className="text-gray-300">12</div><div className="text-gray-300">13</div><div className="text-gray-300">14</div><div className="text-gray-300">15</div><div className="text-gray-300">16</div>
-              <div className="bg-[var(--color-brand-500)] text-[#0B0F19] rounded-lg flex items-center justify-center w-8 h-8 mx-auto shadow-[0_0_10px_rgba(0,200,83,0.5)]">17</div>
-              <div className="text-gray-300">18</div><div className="text-gray-300">19</div><div className="text-gray-300">20</div><div className="text-gray-300">21</div><div className="text-gray-300">22</div><div className="text-gray-300">23</div>
-              <div className="text-gray-300">24</div><div className="text-gray-300">25</div><div className="text-gray-300">26</div><div className="text-gray-300">27</div><div className="text-gray-300">28</div><div className="text-gray-300">29</div><div className="text-gray-300">30</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* SELECTED REPORT DETAIL MODAL */}
-      {selectedReport && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedReport(null)}>
-          <div className="bg-[var(--color-card)] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl relative text-right" onClick={e => e.stopPropagation()} dir="rtl">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
-              <h3 className="font-bold text-white text-lg">📊 عرض تفاصيل التقرير</h3>
-              <button onClick={() => setSelectedReport(null)} className="text-gray-500 hover:text-white transition-colors text-2xl leading-none">×</button>
-            </div>
-            <div className="space-y-4">
-              <div className="bg-[#0B0F19] rounded-xl p-4 border border-white/5 space-y-2">
-                <span className="text-xs text-[var(--color-brand-500)] bg-[var(--color-brand-500)]/10 border border-[var(--color-brand-500)]/20 px-2 py-0.5 rounded-full font-bold">
-                  {selectedReport.type === "Sales" ? "مبيعات" : selectedReport.type === "Payments" ? "مدفوعات" : selectedReport.type === "Stats" ? "إحصائيات" : "تحسين أداء"}
-                </span>
-                <h4 className="text-base font-bold text-white mt-1">{selectedReport.title}</h4>
-                <p className="text-xs text-gray-400 font-cy-bold">{selectedReport.date}</p>
-              </div>
-
-              <div>
-                <p className="text-xs text-gray-400 font-bold mb-1">ملخص التقرير المالي والأداء:</p>
-                <p className="text-sm text-gray-300 leading-relaxed bg-[#0B0F19] p-3 rounded-xl border border-white/5">
-                  {selectedReport.summary}
-                </p>
-              </div>
-
-              {/* Mock Data Display inside Report Modal */}
-              <div className="bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20 rounded-xl p-4 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] text-gray-400 font-bold">حالة التقرير الفني</p>
-                  <p className="text-xs text-emerald-400 font-bold mt-1">🟢 مؤرشف بنجاح</p>
-                </div>
-                <div className="text-left">
-                  <p className="text-[10px] text-gray-400 font-bold">توقيت التحميل</p>
-                  <p className="text-xs text-white font-cy-bold mt-1">Just Now</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button onClick={() => setSelectedReport(null)} className="flex-1 py-3 rounded-xl bg-[var(--color-brand-500)] text-[#0B0F19] font-bold text-sm hover:bg-[var(--color-brand-600)] transition-colors shadow-lg">
-                إغلاق
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ADD NEW REPORT MODAL */}
-      {isAddReportOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setIsAddReportOpen(false)}>
-          <div className="bg-[var(--color-card)] border border-white/10 rounded-3xl p-6 w-full max-w-md shadow-2xl relative text-right" onClick={e => e.stopPropagation()} dir="rtl">
-            <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-4">
-              <h3 className="font-bold text-white text-lg">➕ إنشاء تقرير سريع جديد</h3>
-              <button onClick={() => setIsAddReportOpen(false)} className="text-gray-500 hover:text-white transition-colors text-2xl leading-none">×</button>
-            </div>
-            <form onSubmit={handleCreateReport} className="space-y-4">
-              <div>
-                <label className="text-xs text-gray-400 block mb-1.5 font-bold">عنوان التقرير*</label>
-                <input 
-                  required
-                  type="text" 
-                  value={newReport.title} 
-                  onChange={e => setNewReport({ ...newReport, title: e.target.value })} 
-                  placeholder="مثال: تقرير إيرادات الكباتن الأسبوعي" 
-                  className="w-full bg-[#0B0F19] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-[var(--color-brand-500)] transition-all font-bold"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-gray-400 block mb-1.5 font-bold">نوع التقرير*</label>
-                  <select 
-                    value={newReport.type} 
-                    onChange={e => setNewReport({ ...newReport, type: e.target.value })} 
-                    className="w-full bg-[#0B0F19] border border-white/10 rounded-xl py-3 px-3 text-sm text-white outline-none focus:border-[var(--color-brand-500)] transition-all font-bold"
-                  >
-                    <option value="Sales">مبيعات (Sales)</option>
-                    <option value="Payments">مدفوعات (Payments)</option>
-                    <option value="Stats">إحصائيات (Stats)</option>
-                    <option value="Optimization">تحسين (Optimization)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-400 block mb-1.5 font-bold">تاريخ التقرير*</label>
-                  <input 
-                    required
-                    type="date" 
-                    value={newReport.date} 
-                    onChange={e => setNewReport({ ...newReport, date: e.target.value })} 
-                    className="w-full bg-[#0B0F19] border border-white/10 rounded-xl py-2.5 px-3 text-sm text-white outline-none focus:border-[var(--color-brand-500)] transition-all font-cy-bold text-left"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6 pt-2">
-                <button type="button" onClick={() => setIsAddReportOpen(false)} className="flex-1 py-3 rounded-xl border border-white/10 text-gray-400 hover:bg-white/5 transition-colors font-bold text-sm">
-                  إلغاء
-                </button>
-                <button type="submit" className="flex-1 py-3 rounded-xl bg-[var(--color-brand-500)] text-[#0B0F19] font-bold text-sm hover:bg-[var(--color-brand-600)] transition-colors shadow-lg animate-pulse">
-                  إنشاء وإضافة
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
