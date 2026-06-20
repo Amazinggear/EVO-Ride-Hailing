@@ -1,0 +1,141 @@
+{
+  "@@locale": "en",
+  "appName": "EVO",
+
+  "whereToTitle": "Where to?",
+  "whereToHint": "Search your destination...",
+  "currentLocation": "Your current location",
+  "destinationLabel": "Destination",
+
+  "confirmBooking": "Confirm Booking",
+  "bookingConfirmed": "Booking Confirmed",
+
+  "evBasic": "EV Basic",
+  "evLuxury": "EV Luxury",
+  "evSuv": "EV SUV",
+
+  "co2Saved": "{kg} kg CO₂ saved",
+  "@co2Saved": {
+    "placeholders": {
+      "kg": { "type": "double", "format": "decimalPattern" }
+    }
+  },
+
+  "estimatedArrival": "Estimated Arrival",
+  "minutes": "{count} min",
+  "@minutes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "driverArriving": "Driver is on the way",
+  "driverArrived": "Driver has arrived! 📍",
+  "rideStarted": "Ride started",
+  "rideCompleted": "Ride completed ✅",
+  "rideCancelled": "Ride cancelled",
+
+  "totalFare": "Total",
+  "subtotal": "Subtotal",
+  "discount": "Discount",
+  "jod": "JOD",
+
+  "payWithCash": "Pay with Cash",
+  "payWithCard": "Pay with Card",
+  "cardNumber": "Card Number",
+  "expiryDate": "Expiry Date",
+  "cvv": "CVV",
+  "saveCard": "Save Card",
+  "addNewCard": "Add New Card",
+
+  "promoCodeHint": "Enter promo code",
+  "promoApply": "Apply",
+  "promoApplied": "Code applied! {amount} JOD discount",
+  "@promoApplied": {
+    "placeholders": {
+      "amount": { "type": "double", "format": "decimalPattern" }
+    }
+  },
+  "promoInvalid": "Invalid or expired code",
+
+  "goOnline": "Go Online",
+  "goOffline": "Go Offline",
+  "youAreOnline": "You're Online",
+  "youAreOffline": "You're Offline",
+
+  "dailyEarnings": "Daily Earnings",
+  "weeklyEarnings": "Weekly Earnings",
+  "totalRides": "Total Rides",
+  "carbonOffset": "Carbon Offset",
+
+  "nearbyChargingStations": "⚡ Nearby Charging Stations",
+  "navigate": "Navigate",
+  "available": "Available",
+  "unavailable": "Unavailable",
+  "level2Charger": "Level 2 Charger",
+  "dcFastCharger": "DC Fast Charger",
+
+  "currentBalance": "Current Balance",
+  "withdrawToBank": "Withdraw to Bank",
+  "withdrawAmount": "Withdrawal Amount",
+  "bankIban": "IBAN Number",
+  "bankName": "Bank Name",
+  "accountHolder": "Account Holder Name",
+  "withdrawalRequested": "Withdrawal Requested",
+  "commission": "EVO Commission",
+
+  "driverRegistration": "Driver Registration",
+  "step1Title": "Basic Information",
+  "step2Title": "Identity Documents",
+  "step3Title": "License & Clearance",
+  "step4Title": "Vehicle Information",
+  "step5Title": "Review & Submit",
+
+  "fullName": "Full Name",
+  "dateOfBirth": "Date of Birth",
+  "phone": "Phone Number",
+  "email": "Email (optional)",
+  "nationalId": "National ID Number",
+
+  "uploadNationalIdFront": "Upload National ID — Front",
+  "uploadNationalIdBack": "Upload National ID — Back",
+  "uploadSelfie": "Personal Photo (Selfie)",
+  "uploadLicense": "Upload Driving License",
+  "uploadClearance": "Upload Criminal Record Clearance",
+  "uploadCarPhoto": "Car Photo",
+
+  "carModel": "Car Model",
+  "carPlate": "Plate Number",
+  "carType": "Car Type",
+  "batteryCapacity": "Battery Capacity (kWh)",
+  "rangeKm": "Range (km)",
+
+  "submitApplication": "Submit Application",
+  "pendingApproval": "Application Under Review",
+  "pendingApprovalMessage": "Your application will be reviewed and you'll be notified within 24-48 hours.",
+  "applicationApproved": "Your account is approved! 🎉",
+  "applicationRejected": "Your application was rejected",
+  "moreInfoNeeded": "Additional information required",
+
+  "languageArabic": "العربية",
+  "languageEnglish": "English",
+  "selectLanguage": "Select Language",
+
+  "noDriversAvailable": "No drivers available nearby. Please try again later.",
+  "searchingForDriver": "Searching for a driver...",
+
+  "rideHistory": "Ride History",
+  "noRidesYet": "No rides yet",
+
+  "settings": "Settings",
+  "profile": "Profile",
+  "logout": "Log Out",
+  "save": "Save",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "back": "Back",
+  "next": "Next",
+  "done": "Done",
+  "retry": "Retry",
+  "loading": "Loading...",
+  "error": "Error",
+  "unknownError": "An unexpected error occurred. Please try again."
+}

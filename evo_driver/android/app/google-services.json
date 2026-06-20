@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "381557461479",
+    "project_id": "evo-carshare",
+    "storage_bucket": "evo-carshare.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381557461479:android:bde42c969d8f4d5b332d42",
+        "android_client_info": {
+          "package_name": "com.evo.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACTn02pV7DMeTlgknPnHvaiEoJsWizYPw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:381557461479:android:91bd320cb8b46714332d42",
+        "android_client_info": {
+          "package_name": "com.evo.passenger"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACTn02pV7DMeTlgknPnHvaiEoJsWizYPw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

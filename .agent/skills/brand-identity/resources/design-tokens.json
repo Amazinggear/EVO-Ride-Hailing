@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "brand_name": "ESSENZA",
+    "description": "High-End AI & Web Architecture Design Tokens"
+  },
+  "colors": {
+    "primary": {
+      "DEFAULT": "#000000",
+      "hover": "#333333",
+      "foreground": "#FFFFFF"
+    },
+    "secondary": {
+      "DEFAULT": "#F4F4F5",
+      "foreground": "#18181B"
+    },
+    "background": "#FFFFFF",
+    "foreground": "#09090B",
+    "accent": {
+      "DEFAULT": "#2563EB",
+      "glow": "rgba(37, 99, 235, 0.5)"
+    }
+  },
+  "typography": {
+    "typekit_url": "https://use.typekit.net/zlv1nrt.css",
+    "font_family_headings": [
+      "Custom Essenza Font",
+      "sans-serif"
+    ],
+    "font_family_body": [
+      "Custom Essenza Font",
+      "sans-serif"
+    ],
+    "font_weight_bold": "700",
+    "font_weight_normal": "400"
+  },
+  "animation": {
+    "duration_fast": "0.3s",
+    "duration_normal": "0.6s",
+    "ease_cinematic": "[0.22, 1, 0.36, 1]",
+    "blur_strength": "10px"
+  },
+  "ui": {
+    "border_radius_default": "0.5rem",
+    "border_radius_small": "0.25rem",
+    "spacing_base_unit": "4px"
+  }
+}

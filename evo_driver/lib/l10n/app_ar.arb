@@ -1,0 +1,141 @@
+{
+  "@@locale": "ar",
+  "appName": "EVO",
+
+  "whereToTitle": "إلى أين؟",
+  "whereToHint": "ابحث عن وجهتك...",
+  "currentLocation": "موقعك الحالي",
+  "destinationLabel": "الوجهة",
+
+  "confirmBooking": "تأكيد الحجز",
+  "bookingConfirmed": "تم تأكيد الحجز",
+
+  "evBasic": "كهربائية عادية",
+  "evLuxury": "كهربائية فاخرة",
+  "evSuv": "كهربائية دفع رباعي",
+
+  "co2Saved": "وفّرت {kg} كجم CO₂",
+  "@co2Saved": {
+    "placeholders": {
+      "kg": { "type": "double", "format": "decimalPattern" }
+    }
+  },
+
+  "estimatedArrival": "وقت الوصول التقديري",
+  "minutes": "{count} دقيقة",
+  "@minutes": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+
+  "driverArriving": "الكابتن في الطريق إليك",
+  "driverArrived": "وصل الكابتن! 📍",
+  "rideStarted": "الرحلة بدأت",
+  "rideCompleted": "اكتملت رحلتك ✅",
+  "rideCancelled": "تم إلغاء الرحلة",
+
+  "totalFare": "المجموع",
+  "subtotal": "المجموع قبل الخصم",
+  "discount": "الخصم",
+  "jod": "دينار",
+
+  "payWithCash": "الدفع نقداً",
+  "payWithCard": "الدفع بالبطاقة",
+  "cardNumber": "رقم البطاقة",
+  "expiryDate": "تاريخ الانتهاء",
+  "cvv": "CVV",
+  "saveCard": "حفظ البطاقة",
+  "addNewCard": "إضافة بطاقة جديدة",
+
+  "promoCodeHint": "أدخل كود الخصم",
+  "promoApply": "تطبيق",
+  "promoApplied": "تم تطبيق الكود! خصم {amount} دينار",
+  "@promoApplied": {
+    "placeholders": {
+      "amount": { "type": "double", "format": "decimalPattern" }
+    }
+  },
+  "promoInvalid": "الكود غير صالح أو منتهي الصلاحية",
+
+  "goOnline": "ابدأ العمل",
+  "goOffline": "إيقاف العمل",
+  "youAreOnline": "أنت متاح",
+  "youAreOffline": "أنت غير متاح",
+
+  "dailyEarnings": "أرباح اليوم",
+  "weeklyEarnings": "أرباح الأسبوع",
+  "totalRides": "إجمالي الرحلات",
+  "carbonOffset": "CO₂ الموفّر",
+
+  "nearbyChargingStations": "⚡ محطات شحن قريبة",
+  "navigate": "اتجاهات",
+  "available": "متاح",
+  "unavailable": "غير متاح",
+  "level2Charger": "شاحن Level 2",
+  "dcFastCharger": "شاحن DC سريع",
+
+  "currentBalance": "الرصيد الحالي",
+  "withdrawToBank": "سحب إلى الحساب البنكي",
+  "withdrawAmount": "مبلغ السحب",
+  "bankIban": "رقم IBAN",
+  "bankName": "اسم البنك",
+  "accountHolder": "اسم صاحب الحساب",
+  "withdrawalRequested": "تم إرسال طلب السحب",
+  "commission": "عمولة EVO",
+
+  "driverRegistration": "تسجيل كابتن",
+  "step1Title": "معلوماتك الأساسية",
+  "step2Title": "وثائق الهوية",
+  "step3Title": "الرخصة والسوابق",
+  "step4Title": "معلومات السيارة",
+  "step5Title": "مراجعة وإرسال",
+
+  "fullName": "الاسم الكامل",
+  "dateOfBirth": "تاريخ الميلاد",
+  "phone": "رقم الهاتف",
+  "email": "البريد الإلكتروني (اختياري)",
+  "nationalId": "رقم الهوية الوطنية",
+
+  "uploadNationalIdFront": "ارفع صورة الهوية — الوجه الأمامي",
+  "uploadNationalIdBack": "ارفع صورة الهوية — الوجه الخلفي",
+  "uploadSelfie": "صورة شخصية (سيلفي)",
+  "uploadLicense": "ارفع صورة رخصة القيادة",
+  "uploadClearance": "ارفع شهادة عدم المحكومية",
+  "uploadCarPhoto": "صورة السيارة",
+
+  "carModel": "موديل السيارة",
+  "carPlate": "رقم اللوحة",
+  "carType": "نوع السيارة",
+  "batteryCapacity": "سعة البطاريات (kWh)",
+  "rangeKm": "المدى الزمني (كم)",
+
+  "submitApplication": "إرسال الطلب",
+  "pendingApproval": "طلبك قيد المراجعة",
+  "pendingApprovalMessage": "سيتم مراجعة طلبك وإشعارك خلال 24-48 ساعة.",
+  "applicationApproved": "تم اعتماد حسابك! 🎉",
+  "applicationRejected": "تم رفض طلبك",
+  "moreInfoNeeded": "نحتاج منك معلومات إضافية",
+
+  "languageArabic": "العربية",
+  "languageEnglish": "English",
+  "selectLanguage": "اختر اللغة",
+
+  "noDriversAvailable": "لا يوجد كباتن متاحون الآن. يرجى المحاولة لاحقاً.",
+  "searchingForDriver": "جارٍ البحث عن كابتن...",
+
+  "rideHistory": "سجل الرحلات",
+  "noRidesYet": "لا يوجد رحلات بعد",
+
+  "settings": "الإعدادات",
+  "profile": "الملف الشخصي",
+  "logout": "تسجيل الخروج",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "confirm": "تأكيد",
+  "back": "رجوع",
+  "next": "التالي",
+  "done": "تم",
+  "retry": "إعادة المحاولة",
+  "loading": "جارٍ التحميل...",
+  "error": "حدث خطأ",
+  "unknownError": "حدث خطأ غير متوقع. يرجى المحاولة مجدداً."
+}

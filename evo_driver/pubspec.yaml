@@ -1,0 +1,97 @@
+name: evo_driver
+description: EVO - Electric Vehicle Ride-Hailing App (Driver/Captain)
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State Management
+  flutter_bloc: ^8.1.5
+  equatable: ^2.0.5
+  get_it: ^7.6.7
+
+  # Navigation
+  go_router: ^13.2.0
+
+  # Networking
+  dio: ^5.4.3+1
+  socket_io_client: ^2.0.3+1
+
+  # Firebase (Auth)
+  firebase_core: ^2.31.1
+  firebase_auth: ^4.19.4
+
+  # Maps — flutter_map (OpenStreetMap) — FREE, no API key needed!
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  flutter_map_cancellable_tile_provider: ^3.0.2
+  geolocator: ^11.0.0
+  flutter_background_geolocation: ^4.15.3
+
+  # HTTP for OSRM routing
+  http: ^1.2.1
+
+
+  # Push Notifications
+  onesignal_flutter: ^5.1.6
+
+  # Storage
+  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.2.3
+
+  # UI
+  cached_network_image: ^3.3.1
+  lottie: ^3.1.0
+  shimmer: ^3.0.0
+
+  # File Upload
+  image_picker: ^1.1.2
+  file_picker: ^8.0.3
+  permission_handler: ^11.3.1
+
+  # Utilities
+  intl: 0.20.2
+  uuid: ^4.4.0
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  bloc_test: ^9.1.7
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+  # assets:
+  #   - assets/images/
+  #   - assets/animations/
+  #   - assets/fonts/
+
+  # fonts:
+  #   - family: Cairo
+  #     fonts:
+  #       - asset: assets/fonts/Cairo-Regular.ttf
+  #         weight: 400
+  #       - asset: assets/fonts/Cairo-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Cairo-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/Cairo-Bold.ttf
+  #         weight: 700
+
+  generate: true
+
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21
