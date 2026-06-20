@@ -379,11 +379,21 @@ export default function DriversPage() {
                         <td className="px-4 py-4 text-gray-300 text-xs font-bold">{driver.registered_by_name || '—'}</td>
                         <td className="px-4 py-4 text-center">
                           {driver.onboarding_token ? (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${window.location.origin}/onboarding/${driver.onboarding_token}`); alert('تم نسخ رابط التوثيق!'); }}
-                              className="text-[var(--color-brand-500)] hover:text-white hover:bg-[var(--color-brand-500)]/20 rounded-lg px-2 py-1 text-xs font-bold transition-colors"
-                              title="نسخ رابط التوثيق"
-                            >📋 نسخ</button>
+                            <div className="flex items-center gap-1 justify-center">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${window.location.origin}/onboarding/${driver.onboarding_token}`); alert('تم نسخ رابط التوثيق!'); }}
+                                className="text-[var(--color-brand-500)] hover:text-white hover:bg-[var(--color-brand-500)]/20 rounded-lg px-2 py-1 text-xs font-bold transition-colors"
+                                title="نسخ رابط التوثيق"
+                              >📋</button>
+                              <a
+                                href={`https://wa.me/${driver.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(`مرحباً ${driver.full_name}،\n\nهذا رابط توثيق حساب الكابتن الخاص بك في EVO:\n${typeof window !== 'undefined' ? window.location.origin : ''}/onboarding/${driver.onboarding_token}\n\nيرجى فتح الرابط ورفع المستندات المطلوبة:\n- صورة الهوية\n- صورة شخصية\n- رخصة القيادة\n- شهادة عدم محكومية\n\nشكراً لك 🚗⚡`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-green-400 hover:text-white hover:bg-green-500/20 rounded-lg px-2 py-1 text-xs font-bold transition-colors"
+                                title="إرسال عبر واتساب"
+                              >💬</a>
+                            </div>
                           ) : <span className="text-gray-600 text-xs">—</span>}
                         </td>
                       </tr>
@@ -479,15 +489,23 @@ export default function DriversPage() {
             )}
             {/* Onboarding Link */}
             {selectedDriver.onboarding_token && (
-              <div className="bg-[var(--color-brand-500)]/5 border border-[var(--color-brand-500)]/20 rounded-xl p-4">
-                <p className="text-gray-400 text-xs font-bold mb-2">🔗 رابط التوثيق للكابتن</p>
-                <code className="block text-[var(--color-brand-500)] text-xs break-all mb-2 font-cy-bold bg-[#0B0F19] p-2 rounded-lg">
+              <div className="bg-[var(--color-brand-500)]/5 border border-[var(--color-brand-500)]/20 rounded-xl p-4 space-y-3">
+                <p className="text-gray-400 text-xs font-bold">🔗 رابط التوثيق للكابتن</p>
+                <code className="block text-[var(--color-brand-500)] text-xs break-all font-cy-bold bg-[#0B0F19] p-2 rounded-lg">
                   {`${typeof window !== 'undefined' ? window.location.origin : ''}/onboarding/${selectedDriver.onboarding_token}`}
                 </code>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/onboarding/${selectedDriver.onboarding_token}`); alert('تم النسخ!'); }}
-                  className="w-full text-xs font-bold bg-[var(--color-brand-500)] text-[#0B0F19] py-2 rounded-lg hover:bg-[var(--color-brand-600)] transition-colors"
-                >📋 نسخ الرابط</button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/onboarding/${selectedDriver.onboarding_token}`); alert('تم النسخ!'); }}
+                    className="flex-1 text-xs font-bold bg-[var(--color-brand-500)] text-[#0B0F19] py-2 rounded-lg hover:bg-[var(--color-brand-600)] transition-colors"
+                  >📋 نسخ الرابط</button>
+                  <a
+                    href={`https://wa.me/${selectedDriver.phone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(`مرحباً ${selectedDriver.full_name}،\n\nهذا رابط توثيق حساب الكابتن الخاص بك في EVO:\n${typeof window !== 'undefined' ? window.location.origin : ''}/onboarding/${selectedDriver.onboarding_token}\n\nيرجى فتح الرابط ورفع المستندات المطلوبة:\n- صورة الهوية\n- صورة شخصية\n- رخصة القيادة\n- شهادة عدم محكومية\n\nشكراً لك 🚗⚡`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 text-xs font-bold bg-green-500/20 text-green-400 py-2 rounded-lg hover:bg-green-500/30 border border-green-500/30 transition-colors text-center"
+                  >💬 واتساب</a>
+                </div>
               </div>
             )}
 
