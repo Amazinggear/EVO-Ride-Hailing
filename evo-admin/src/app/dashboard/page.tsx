@@ -256,7 +256,7 @@ export default function DashboardHome() {
       </div>
 
       {/* PLACEHOLDER — real charts when rides start */}
-      <div className="bg-card rounded-3xl p-8 border border-white/5 shadow-lg text-center">
+      <div className="bg-[var(--color-card)] rounded-3xl p-8 border border-white/5 shadow-lg text-center">
         <div className="text-5xl mb-4">📊</div>
         <h3 className="text-white font-bold text-lg mb-2">الرسوم البيانية والتقارير</h3>
         <p className="text-gray-400 text-sm">ستظهر المخططات فور بدء استقبال الرحلات.</p>
