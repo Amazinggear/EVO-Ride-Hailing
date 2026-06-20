@@ -226,6 +226,7 @@ const getMe = async (req, res) => {
       email: user.email,
       avatarUrl: user.avatar_url,
       role: user.role,
+      adminRole: user.admin_role || null,
       status: user.status,
       preferredLanguage: user.preferred_language,
       approvalStatus,
