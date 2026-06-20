@@ -1,8 +1,8 @@
-name: Keep Render Awake
+name: Keep EVO Backend Awake (Backup)
 
 on:
   schedule:
-    - cron: '*/14 * * * *' # Runs every 14 minutes
+    - cron: '*/7 * * * *' # Runs every 7 minutes (backup pinger)
   workflow_dispatch:
 
 jobs:
@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Backend
-        run: curl -s https://evo-backend-5dm0.onrender.com/api/health
+        run: curl -s --max-time 30 https://evo-backend-5zsg.onrender.com/health || echo "Ping sent"
