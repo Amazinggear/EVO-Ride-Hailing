@@ -59,7 +59,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const fetchProfile = async () => {
     const token = localStorage.getItem("evo_admin_token");
-    if (!token) return;
+    if (!token) {
+      router.push("/login");
+      return;
+    }
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/me`, {
         headers: { "Bypass-Tunnel-Reminder": "true", Authorization: `Bearer ${token}` },
