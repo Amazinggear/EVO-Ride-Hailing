@@ -24,6 +24,11 @@ export default function AdminsPage() {
   const [message, setMessage] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
 
+  // ── Detail Panel ──
+  const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
+  const [adminLogs, setAdminLogs] = useState<any[]>([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+
   const getToken = () => localStorage.getItem("evo_admin_token") || "";
 
   const fetchAdmins = useCallback(async () => {
@@ -107,6 +112,7 @@ export default function AdminsPage() {
       });
       const data = await res.json();
       if (res.ok) {
+        setSelectedAdmin(null);
         fetchAdmins();
       } else {
         alert(data.error || "فشل الحذف");
@@ -116,6 +122,26 @@ export default function AdminsPage() {
     } finally {
       setDeleting(null);
     }
+  };
+
+  const selectAdmin = async (admin: AdminUser) => {
+    if (selectedAdmin?.id === admin.id) {
+      setSelectedAdmin(null);
+      setAdminLogs([]);
+      return;
+    }
+    setSelectedAdmin(admin);
+    setLogsLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/audit-logs?limit=30`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      const data = await res.json();
+      // Filter logs for this specific admin
+      const filtered = (data.logs || []).filter((l: any) => l.admin_id === admin.id);
+      setAdminLogs(filtered);
+    } catch { setAdminLogs([]); }
+    finally { setLogsLoading(false); }
   };
 
   const ROLE_LABELS: Record<string, string> = {
@@ -160,7 +186,8 @@ export default function AdminsPage() {
           <div className="w-8 h-8 border-4 border-white/10 border-t-[var(--color-brand-500)] rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="bg-[var(--color-card)] border border-white/5 rounded-3xl overflow-hidden shadow-lg animate-fade-in-up delay-200">
+        <div className="flex gap-4">
+        <div className="bg-[var(--color-card)] border border-white/5 rounded-3xl overflow-hidden shadow-lg animate-fade-in-up delay-200 flex-1">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -176,13 +203,22 @@ export default function AdminsPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {admins.map((admin) => (
-                  <tr key={admin.id} className="hover:bg-white/5 transition-colors">
+                  <tr
+                    key={admin.id}
+                    onClick={() => selectAdmin(admin)}
+                    className={`cursor-pointer transition-colors ${
+                      selectedAdmin?.id === admin.id
+                        ? 'bg-[var(--color-brand-500)]/10 border-r-2 border-r-[var(--color-brand-500)]'
+                        : 'hover:bg-white/5'
+                    }`}
+                  >
                     <td className="px-5 py-4 font-bold text-white">{admin.full_name}</td>
                     <td className="px-4 py-4 text-gray-300 font-cy-bold" dir="ltr">{admin.email}</td>
                     <td className="px-4 py-4">
                       <select 
                         value={admin.admin_role || "support"} 
-                        onChange={(e) => updateRole(admin.id, e.target.value)}
+                        onChange={(e) => { e.stopPropagation(); updateRole(admin.id, e.target.value); }}
+                        onClick={(e) => e.stopPropagation()}
                         className="bg-[#0B0F19] border border-white/10 rounded-lg px-2 py-1 text-white text-xs font-bold outline-none focus:border-[var(--color-brand-500)]"
                       >
                         {Object.entries(ROLE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
@@ -199,7 +235,7 @@ export default function AdminsPage() {
                     </td>
                     <td className="px-4 py-4 text-center">
                       <button
-                        onClick={() => handleDelete(admin.id, admin.full_name)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(admin.id, admin.full_name); }}
                         disabled={deleting === admin.id}
                         className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg px-2 py-1 text-xs font-bold transition-colors disabled:opacity-50"
                         title="حذف"
@@ -212,6 +248,101 @@ export default function AdminsPage() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Detail Panel */}
+        {selectedAdmin && (
+          <div className="w-80 shrink-0 bg-[var(--color-card)] border border-white/5 rounded-3xl p-6 space-y-5 self-start sticky top-24 shadow-xl animate-fade-in-up">
+            <div className="flex items-center justify-between">
+              <h3 className="font-black text-white text-lg">تحليل الموظف</h3>
+              <button onClick={() => { setSelectedAdmin(null); setAdminLogs([]); }} className="text-gray-500 hover:text-white text-2xl leading-none">×</button>
+            </div>
+
+            {/* Admin Info */}
+            <div className="bg-[#0B0F19] rounded-2xl p-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-[var(--color-brand-500)]/10 border border-[var(--color-brand-500)]/20 flex items-center justify-center font-black text-lg text-[var(--color-brand-500)]">
+                  {selectedAdmin.full_name?.charAt(0)}
+                </div>
+                <div>
+                  <p className="text-white font-bold">{selectedAdmin.full_name}</p>
+                  <p className="text-gray-500 text-xs" dir="ltr">{selectedAdmin.email}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-white/5 rounded-lg p-2 text-center">
+                  <p className="text-gray-500">الصلاحية</p>
+                  <p className="text-[var(--color-brand-500)] font-bold">{ROLE_LABELS[selectedAdmin.admin_role]}</p>
+                </div>
+                <div className="bg-white/5 rounded-lg p-2 text-center">
+                  <p className="text-gray-500">الحالة</p>
+                  <p className={`font-bold ${selectedAdmin.status === 'active' ? 'text-green-400' : 'text-red-400'}`}>
+                    {selectedAdmin.status === 'active' ? '🟢 نشط' : '🔴 موقوف'}
+                  </p>
+                </div>
+                <div className="bg-white/5 rounded-lg p-2 text-center">
+                  <p className="text-gray-500">ساعات العمل</p>
+                  <p className="text-white font-cy-bold">{selectedAdmin.total_hours || '0'} س</p>
+                </div>
+                <div className="bg-white/5 rounded-lg p-2 text-center">
+                  <p className="text-gray-500">زيارات الصفحات</p>
+                  <p className="text-white font-cy-bold">{selectedAdmin.total_visits || '0'}</p>
+                </div>
+              </div>
+              <div className="text-xs space-y-1 pt-2 border-t border-white/5">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">تاريخ التسجيل:</span>
+                  <span className="text-gray-300">{new Date(selectedAdmin.created_at).toLocaleDateString("ar-EG-u-nu-latn")}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">آخر دخول:</span>
+                  <span className="text-gray-300">{timeAgo(selectedAdmin.last_login_at)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">آخر نشاط:</span>
+                  <span className={timeAgo(selectedAdmin.last_seen) === 'الآن' ? 'text-green-400 font-bold' : 'text-gray-300'}>
+                    {timeAgo(selectedAdmin.last_seen)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions Log */}
+            <div>
+              <p className="text-gray-400 text-xs font-bold mb-3">📋 آخر الإجراءات</p>
+              {logsLoading ? (
+                <div className="flex justify-center py-4">
+                  <div className="w-5 h-5 border-2 border-white/10 border-t-[var(--color-brand-500)] rounded-full animate-spin" />
+                </div>
+              ) : adminLogs.length === 0 ? (
+                <p className="text-gray-600 text-xs text-center py-4">لا توجد إجراءات مسجلة بعد</p>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                  {adminLogs.map((log: any) => (
+                    <div key={log.id} className="bg-[#0B0F19] rounded-xl p-3 text-xs">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[var(--color-brand-500)] font-bold">{log.action}</span>
+                        <span className="text-gray-600">{timeAgo(log.created_at)}</span>
+                      </div>
+                      <p className="text-gray-400 truncate">
+                        {log.target_type}: {log.details?.substring(0, 60)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Delete Button */}
+            <button
+              onClick={() => handleDelete(selectedAdmin.id, selectedAdmin.full_name)}
+              disabled={deleting === selectedAdmin.id}
+              className="w-full py-2.5 rounded-xl text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 transition-colors disabled:opacity-50"
+            >
+              {deleting === selectedAdmin.id ? '⏳ جاري الحذف...' : '🗑️ حذف الموظف'}
+            </button>
+          </div>
+        )}
         </div>
       )}
       </div>
