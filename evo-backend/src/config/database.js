@@ -33,9 +33,31 @@ const runMigration = async () => {
   try {
     await pool.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT");
     await pool.query("UPDATE users SET password_hash = '123456' WHERE role = 'admin' AND password_hash IS NULL");
-    logger.info('✅ password_hash column ensured');
+    // Track which admin registered each driver
+    await pool.query("ALTER TABLE driver_profiles ADD COLUMN IF NOT EXISTS registered_by UUID REFERENCES users(id)");
+    // Driver sessions for working hours / last seen
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS driver_sessions (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        driver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        status VARCHAR(10) NOT NULL CHECK (status IN ('online','offline')),
+        started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        ended_at TIMESTAMPTZ,
+        duration_minutes INT GENERATED ALWAYS AS (
+          CASE WHEN ended_at IS NOT NULL 
+            THEN EXTRACT(EPOCH FROM (ended_at - started_at)) / 60 
+            ELSE NULL 
+          END
+        ) STORED
+      )
+    `);
+    await pool.query("CREATE INDEX IF NOT EXISTS idx_driver_sessions_driver ON driver_sessions(driver_id)");
+    await pool.query("CREATE INDEX IF NOT EXISTS idx_driver_sessions_status ON driver_sessions(status)");
+    // Unique onboarding token for each driver
+    await pool.query("ALTER TABLE driver_profiles ADD COLUMN IF NOT EXISTS onboarding_token TEXT UNIQUE");
+    logger.info('✅ Migrations v5 applied: registered_by, driver_sessions, onboarding_token');
   } catch (err) {
-    logger.warn('⚠️ password_hash migration skipped:', err.message);
+    logger.warn('⚠️ Migration v5 skipped:', err.message);
   }
 };
 migrationReady = runMigration();

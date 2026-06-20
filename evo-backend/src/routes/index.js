@@ -77,9 +77,16 @@ router.patch('/driver/toggle-online', authenticate, requireRole('driver'), async
     }
     await setDriverOnline(userId, rows[0].car_type);
     await query('UPDATE driver_profiles SET is_online = true WHERE user_id = $1', [userId]);
+    // Start new session
+    await query("INSERT INTO driver_sessions (driver_id, status) VALUES ($1, 'online')", [userId]);
   } else {
     await setDriverOffline(userId);
     await query('UPDATE driver_profiles SET is_online = false WHERE user_id = $1', [userId]);
+    // End latest open session
+    await query(
+      "UPDATE driver_sessions SET status = 'offline', ended_at = NOW() WHERE driver_id = $1 AND status = 'online' AND ended_at IS NULL",
+      [userId]
+    );
   }
   res.json({ success: true, isOnline });
 });
@@ -170,6 +177,55 @@ adminRouter.post('/drivers/:id/request-info', gate('operations'), requestMoreInf
 adminRouter.post('/drivers', gate('operations'), adminController.createDriver);
 adminRouter.delete('/drivers/:id', gate('operations'), adminController.deleteDriver);
 
+// ── Driver Onboarding (public link — no auth, uses token) ──
+router.get('/admin/drivers/onboarding/:token', async (req, res) => {
+  const { query } = require('../config/database');
+  try {
+    const { rows } = await query(
+      `SELECT u.full_name, u.phone, u.email,
+              dp.car_type, dp.car_model, dp.car_plate, dp.approval_status,
+              dp.national_id_front_url, dp.national_id_back_url,
+              dp.personal_photo_url, dp.license_photo_url, dp.criminal_clearance_url
+       FROM driver_profiles dp
+       JOIN users u ON u.id = dp.user_id
+       WHERE dp.onboarding_token = $1`,
+      [req.params.token]
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Invalid or expired link' });
+    return res.json({ driver: rows[0] });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to load driver' });
+  }
+});
+
+router.post('/admin/drivers/onboarding/:token', async (req, res) => {
+  const { query } = require('../config/database');
+  try {
+    const { national_id_front, national_id_back, personal_photo, license_photo, criminal_clearance } = req.body;
+    // Validate at least one file uploaded
+    if (!national_id_front && !national_id_back && !personal_photo && !license_photo && !criminal_clearance) {
+      return res.status(400).json({ error: 'يرجى رفع مستند واحد على الأقل' });
+    }
+    const updates = [];
+    const values = [];
+    let i = 1;
+    if (national_id_front) { updates.push(`national_id_front_url = $${i++}`); values.push(national_id_front); }
+    if (national_id_back) { updates.push(`national_id_back_url = $${i++}`); values.push(national_id_back); }
+    if (personal_photo) { updates.push(`personal_photo_url = $${i++}`); values.push(personal_photo); }
+    if (license_photo) { updates.push(`license_photo_url = $${i++}`); values.push(license_photo); }
+    if (criminal_clearance) { updates.push(`criminal_clearance_url = $${i++}`); values.push(criminal_clearance); }
+    values.push(req.params.token);
+    const { rows } = await query(
+      `UPDATE driver_profiles SET ${updates.join(', ')} WHERE onboarding_token = $${i} RETURNING user_id`,
+      values
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Invalid token' });
+    return res.json({ success: true, message: 'Documents uploaded successfully' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to upload documents' });
+  }
+});
+
 // Live tracking
 adminRouter.get('/rides/live', gate('operations'), adminController.getLiveRides);
 
@@ -240,7 +296,7 @@ adminRouter.get('/rides', gate('operations'), async (req, res) => {
   }
 });
 
-// Admin drivers list
+// Admin drivers list — filtered by registered_by for non-super_admin
 adminRouter.get('/drivers', gate('operations'), async (req, res) => {
   const { query } = require('../config/database');
   try {
@@ -251,19 +307,35 @@ adminRouter.get('/drivers', gate('operations'), async (req, res) => {
 
     if (status && status !== 'all') { conditions.push(`dp.approval_status = $${i++}`); values.push(status); }
     if (search) { conditions.push(`(u.full_name ILIKE $${i} OR u.phone ILIKE $${i} OR dp.car_plate ILIKE $${i})`); values.push(`%${search}%`); i++; }
+    // Non-super_admin sees only their own registered drivers
+    if (req.user.admin_role !== 'super_admin') {
+      conditions.push(`dp.registered_by = $${i++}`); values.push(req.user.id);
+    }
 
     const where = conditions.length ? `AND ${conditions.join(' AND ')}` : '';
 
     const { rows } = await query(
-      `SELECT u.id, u.full_name, u.phone,
+      `SELECT u.id, u.full_name, u.phone, u.last_login_at,
               dp.car_type, dp.car_model, dp.car_plate, dp.approval_status,
               dp.rating, dp.wallet_balance, dp.total_rides, dp.cliq_alias,
               dp.national_id_number, dp.license_number,
               dp.national_id_front_url, dp.national_id_back_url,
               dp.personal_photo_url, dp.license_photo_url, dp.criminal_clearance_url,
-              u.created_at
+              dp.registered_by, dp.onboarding_token,
+              adm.full_name as registered_by_name,
+              u.created_at,
+              COALESCE(ds.total_hours, 0) as working_hours,
+              GREATEST(u.last_login_at, ds.last_online) as last_seen
        FROM users u
        JOIN driver_profiles dp ON dp.user_id = u.id
+       LEFT JOIN users adm ON adm.id = dp.registered_by
+       LEFT JOIN (
+         SELECT driver_id,
+                ROUND(SUM(EXTRACT(EPOCH FROM (COALESCE(ended_at, NOW()) - started_at)) / 3600)::numeric, 1) as total_hours,
+                MAX(started_at) as last_online
+         FROM driver_sessions
+         GROUP BY driver_id
+       ) ds ON ds.driver_id = u.id
        WHERE u.role = 'driver' ${where}
        ORDER BY u.created_at DESC`,
       values
@@ -288,6 +360,11 @@ adminRouter.get('/drivers', gate('operations'), async (req, res) => {
       personal_photo_url: r.personal_photo_url,
       license_photo_url: r.license_photo_url,
       criminal_clearance_url: r.criminal_clearance_url,
+      registered_by: r.registered_by,
+      registered_by_name: r.registered_by_name,
+      onboarding_token: r.onboarding_token,
+      working_hours: parseFloat(r.working_hours) || 0,
+      last_seen: r.last_seen || r.last_login_at,
       created_at: r.created_at,
     }));
 

@@ -22,6 +22,11 @@ interface Driver {
   personal_photo_url?: string;
   license_photo_url?: string;
   criminal_clearance_url?: string;
+  registered_by?: string;
+  registered_by_name?: string;
+  onboarding_token?: string;
+  working_hours?: number;
+  last_seen?: string;
 }
 
 interface NewCaptainForm {
@@ -66,6 +71,19 @@ function StarRating({ value }: { value: number }) {
       <span className="text-white text-sm font-bold">{value.toFixed(1)}</span>
     </div>
   );
+}
+
+function TimeAgo({ date }: { date?: string }) {
+  if (!date) return <span className="text-gray-600 text-xs">—</span>;
+  const now = Date.now();
+  const then = new Date(date).getTime();
+  const diffMin = Math.floor((now - then) / 60000);
+  if (diffMin < 1) return <span className="text-green-400 text-xs font-bold">الآن</span>;
+  if (diffMin < 60) return <span className="text-gray-400 text-xs font-bold">{diffMin}د</span>;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return <span className="text-gray-400 text-xs font-bold">{diffHr}س</span>;
+  const diffDay = Math.floor(diffHr / 24);
+  return <span className="text-gray-500 text-xs font-bold">{diffDay} يوم</span>;
 }
 
 export default function DriversPage() {
@@ -298,6 +316,10 @@ export default function DriversPage() {
                     <th className="px-4 py-4 text-right text-gray-400 font-bold">التقييم</th>
                     <th className="px-4 py-4 text-right text-gray-400 font-bold">الرصيد</th>
                     <th className="px-4 py-4 text-right text-gray-400 font-bold">الرحلات</th>
+                    <th className="px-4 py-4 text-right text-gray-400 font-bold">ساعات العمل</th>
+                    <th className="px-4 py-4 text-right text-gray-400 font-bold">آخر ظهور</th>
+                    <th className="px-4 py-4 text-right text-gray-400 font-bold">مسجل بواسطة</th>
+                    <th className="px-4 py-4 text-center text-gray-400 font-bold">رابط التوثيق</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
@@ -352,6 +374,18 @@ export default function DriversPage() {
                           </span>
                         </td>
                         <td className="px-4 py-4 text-white font-cy-bold">{driver.total_rides.toLocaleString('en-US')}</td>
+                        <td className="px-4 py-4 text-white font-cy-bold text-xs">{driver.working_hours?.toFixed(1) || '—'} س</td>
+                        <td className="px-4 py-4"><TimeAgo date={driver.last_seen} /></td>
+                        <td className="px-4 py-4 text-gray-300 text-xs font-bold">{driver.registered_by_name || '—'}</td>
+                        <td className="px-4 py-4 text-center">
+                          {driver.onboarding_token ? (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(`${window.location.origin}/onboarding/${driver.onboarding_token}`); alert('تم نسخ رابط التوثيق!'); }}
+                              className="text-[var(--color-brand-500)] hover:text-white hover:bg-[var(--color-brand-500)]/20 rounded-lg px-2 py-1 text-xs font-bold transition-colors"
+                              title="نسخ رابط التوثيق"
+                            >📋 نسخ</button>
+                          ) : <span className="text-gray-600 text-xs">—</span>}
+                        </td>
                       </tr>
                     );
                   })}
@@ -443,6 +477,20 @@ export default function DriversPage() {
                 </div>
               </div>
             )}
+            {/* Onboarding Link */}
+            {selectedDriver.onboarding_token && (
+              <div className="bg-[var(--color-brand-500)]/5 border border-[var(--color-brand-500)]/20 rounded-xl p-4">
+                <p className="text-gray-400 text-xs font-bold mb-2">🔗 رابط التوثيق للكابتن</p>
+                <code className="block text-[var(--color-brand-500)] text-xs break-all mb-2 font-cy-bold bg-[#0B0F19] p-2 rounded-lg">
+                  {`${typeof window !== 'undefined' ? window.location.origin : ''}/onboarding/${selectedDriver.onboarding_token}`}
+                </code>
+                <button
+                  onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/onboarding/${selectedDriver.onboarding_token}`); alert('تم النسخ!'); }}
+                  className="w-full text-xs font-bold bg-[var(--color-brand-500)] text-[#0B0F19] py-2 rounded-lg hover:bg-[var(--color-brand-600)] transition-colors"
+                >📋 نسخ الرابط</button>
+              </div>
+            )}
+
             {/* Actions */}
             <div className="space-y-2 pt-2 border-t border-white/5">
               <p className="text-gray-500 text-xs font-bold mb-2">الإجراءات</p>

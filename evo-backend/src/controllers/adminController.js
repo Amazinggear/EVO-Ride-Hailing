@@ -280,16 +280,22 @@ const createDriver = async (req, res) => {
     );
     const userId = userRows[0].id;
 
+    // Generate unique onboarding token
+    const crypto = require('crypto');
+    const onboardingToken = crypto.randomBytes(24).toString('hex');
+    const onboardingLink = `${process.env.ADMIN_URL || 'https://evo-admin-weld.vercel.app'}/onboarding/${onboardingToken}`;
+
     // MVP: Generate placeholder URLs for documents
     const placeholderUrl = 'https://via.placeholder.com/300?text=Pending+Verification';
 
-    // Create driver profile with all required fields
+    // Create driver profile with registered_by + onboarding_token
     const { rows: driverRows } = await query(
       `INSERT INTO driver_profiles 
         (user_id, car_type, car_model, car_plate, cliq_alias, approval_status, is_online, 
          national_id_number, license_number, national_id_front_url, national_id_back_url,
-         personal_photo_url, license_photo_url, criminal_clearance_url)
-       VALUES ($1, $2, $3, $4, $5, 'approved', false, $6, $7, $8, $8, $8, $8, $8) 
+         personal_photo_url, license_photo_url, criminal_clearance_url,
+         registered_by, onboarding_token)
+       VALUES ($1, $2, $3, $4, $5, 'approved', false, $6, $7, $8, $8, $8, $8, $8, $9, $10) 
        RETURNING *`,
       [
         userId, 
@@ -299,7 +305,9 @@ const createDriver = async (req, res) => {
         cliqAlias,
         nationalIdNumber || `MVA-${Date.now()}`,
         licenseNumber || `DL-${Date.now()}`,
-        placeholderUrl
+        placeholderUrl,
+        req.user.id,
+        onboardingToken
       ]
     );
 
@@ -307,12 +315,13 @@ const createDriver = async (req, res) => {
     await query(
       `INSERT INTO admin_audit_logs (admin_id, action, target_type, target_id, details)
        VALUES ($1, 'create_driver', 'driver', $2, $3)`,
-      [req.user.id, userId, JSON.stringify({ fullName, carType, carPlate })]
+      [req.user.id, userId, JSON.stringify({ fullName, carType, carPlate, registeredBy: req.user.full_name })]
     );
 
     return res.status(201).json({
       success: true,
       message: 'Captain added successfully',
+      onboardingLink,
       driver: {
         id: userId,
         fullName: userRows[0].full_name,
@@ -324,6 +333,7 @@ const createDriver = async (req, res) => {
         cliqAlias: driverRows[0].cliq_alias,
         approvalStatus: driverRows[0].approval_status,
         walletBalance: parseFloat(driverRows[0].wallet_balance),
+        registeredBy: req.user.full_name,
       },
     });
   } catch (err) {
