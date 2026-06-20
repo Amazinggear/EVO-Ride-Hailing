@@ -97,7 +97,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function FinancialReportsPage() {
   const [period, setPeriod] = useState<Period>("week");
-  const [summary, setSummary] = useState<FinancialSummary>({ totalRevenue: 0, totalCommission: 0, totalTrips: 0, activeDrivers: 0, activePassengers: 0 });
+  const [summary, setSummary] = useState<FinancialSummary>({ totalRevenue: 0, totalCommission: 0, totalRides: 0, avgFarePerRide: 0, activeDrivers: 0, growthRate: 0 });
   const [loading, setLoading] = useState(false);
   const chartData = period === "week" ? weeklyRevenue : monthlyRevenue;
   const xKey = "label";

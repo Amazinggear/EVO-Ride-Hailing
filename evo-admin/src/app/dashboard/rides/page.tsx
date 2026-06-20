@@ -98,7 +98,7 @@ export default function RidesPage() {
       setData(json);
     } catch {
       console.error('Failed to fetch rides');
-      setData({ rides: [], total: 0, total_pages: 0, summary: { total_rides: 0, total_revenue: 0, total_commission: 0 } });
+      setData({ rides: [], total: 0, page: 1, total_pages: 0, summary: { total_rides: 0, total_revenue: 0, total_commission: 0 } });
     } finally {
       setLoading(false);
     }
