@@ -66,7 +66,20 @@ const runMigration = async () => {
       )
     `);
     await pool.query("CREATE INDEX IF NOT EXISTS idx_admin_activity_admin ON admin_activity(admin_id)");
-    logger.info('✅ Migrations v5 applied: registered_by, driver_sessions, onboarding_token, admin_activity');
+    // System error logs
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS system_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        category VARCHAR(30) NOT NULL CHECK (category IN ('system','payment','notification','gps','other')),
+        level VARCHAR(10) NOT NULL DEFAULT 'error' CHECK (level IN ('error','warn','info')),
+        message TEXT NOT NULL,
+        details JSONB,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+    await pool.query("CREATE INDEX IF NOT EXISTS idx_system_logs_category ON system_logs(category)");
+    await pool.query("CREATE INDEX IF NOT EXISTS idx_system_logs_created ON system_logs(created_at DESC)");
+    logger.info('✅ All migrations applied');
   } catch (err) {
     logger.warn('⚠️ Migration v5 skipped:', err.message);
   }

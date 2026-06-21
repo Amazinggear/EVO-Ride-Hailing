@@ -12,12 +12,28 @@ const getDashboardStats = async (req, res) => {
         (SELECT COUNT(*) FROM users WHERE role = 'passenger') AS total_passengers,
         (SELECT COUNT(*) FROM users WHERE role = 'driver') AS total_drivers,
         (SELECT COUNT(*) FROM driver_profiles WHERE approval_status = 'pending') AS pending_approvals,
-        (SELECT COUNT(*) FROM rides WHERE status IN ('searching','accepted','arriving','arrived','in_progress')) AS active_rides
+        (SELECT COUNT(*) FROM rides WHERE status IN ('searching','accepted','arriving','arrived','in_progress')) AS active_rides,
+        (SELECT COUNT(*) FROM users WHERE role = 'passenger' AND last_login_at > NOW() - INTERVAL '10 minutes') AS online_passengers,
+        (SELECT COUNT(*) FROM (
+          SELECT DISTINCT admin_id FROM admin_activity WHERE visited_at > NOW() - INTERVAL '2 minutes'
+        ) a) AS online_staff
     `);
 
     const onlineDrivers = await getOnlineDrivers();
 
-    return res.json({ ...rows[0], online_drivers: onlineDrivers.length });
+    return res.json({
+      ...rows[0],
+      online_drivers: onlineDrivers.length,
+      total_passengers: parseInt(rows[0].total_passengers),
+      total_drivers: parseInt(rows[0].total_drivers),
+      active_rides: parseInt(rows[0].active_rides),
+      pending_approvals: parseInt(rows[0].pending_approvals),
+      online_passengers: parseInt(rows[0].online_passengers),
+      online_staff: parseInt(rows[0].online_staff),
+      rides_today: parseInt(rows[0].rides_today),
+      completed_today: parseInt(rows[0].completed_today),
+      revenue_today: parseFloat(rows[0].revenue_today),
+    });
   } catch (err) {
     logger.error('getDashboardStats error:', err.message);
     return res.status(500).json({ error: 'Failed to fetch stats' });

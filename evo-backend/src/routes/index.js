@@ -437,6 +437,61 @@ adminRouter.post('/activity/ping', async (req, res) => {
   }
 });
 
+// System Logs
+adminRouter.get('/system-logs', async (req, res) => {
+  const { query } = require('../config/database');
+  try {
+    const { category, limit = 50 } = req.query;
+    const catFilter = category ? 'AND category = $1' : '';
+    const params = category ? [category, limit] : [limit];
+    const { rows } = await query(
+      `SELECT * FROM system_logs WHERE 1=1 ${catFilter} ORDER BY created_at DESC LIMIT $${category ? 2 : 1}`,
+      params
+    );
+    return res.json({ logs: rows });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch system logs' });
+  }
+});
+
+// Enhanced Staff Stats (daily/monthly hours + completed ops)
+adminRouter.get('/staff-metrics', async (req, res) => {
+  const { query } = require('../config/database');
+  try {
+    const { rows } = await query(`
+      SELECT u.id, u.full_name, u.email, u.admin_role,
+        -- Daily hours
+        COALESCE(
+          (SELECT ROUND(SUM(duration_seconds)/3600.0, 1) FROM admin_activity 
+           WHERE admin_id = u.id AND visited_at::DATE = CURRENT_DATE), 0
+        ) as daily_hours,
+        -- Monthly hours
+        COALESCE(
+          (SELECT ROUND(SUM(duration_seconds)/3600.0, 1) FROM admin_activity 
+           WHERE admin_id = u.id AND visited_at >= DATE_TRUNC('month', CURRENT_DATE)), 0
+        ) as monthly_hours,
+        -- Completed operations (audit log entries)
+        COALESCE(
+          (SELECT COUNT(*) FROM admin_audit_logs WHERE admin_id = u.id), 0
+        ) as total_operations,
+        -- Today's operations
+        COALESCE(
+          (SELECT COUNT(*) FROM admin_audit_logs WHERE admin_id = u.id AND created_at::DATE = CURRENT_DATE), 0
+        ) as today_operations,
+        -- Last login
+        u.last_login_at,
+        -- Last activity
+        (SELECT MAX(visited_at) FROM admin_activity WHERE admin_id = u.id) as last_activity
+      FROM users u
+      WHERE u.role = 'admin'
+      ORDER BY u.created_at DESC
+    `);
+    return res.json({ staff: rows });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to fetch staff metrics' });
+  }
+});
+
 // Backup
 adminRouter.get('/backup/export', async (req, res) => {
   const { performBackup } = require('../utils/backupService');

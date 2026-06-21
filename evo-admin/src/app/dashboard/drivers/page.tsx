@@ -230,12 +230,25 @@ export default function DriversPage() {
           <h1 className="text-2xl font-black text-white">الكباتن 👥</h1>
           <p className="text-gray-400 text-sm mt-1">جميع السائقين المسجلين في المنصة</p>
         </div>
-        <button
-          onClick={() => { setShowAddModal(true); setAddError(''); setAddSuccess(''); }}
-          className="bg-[var(--color-brand-500)] hover:bg-[var(--color-brand-600)] text-[#0B0F19] font-bold px-5 py-2.5 rounded-xl transition-all active:scale-95 flex items-center gap-2 shadow-[0_0_15px_rgba(0,200,83,0.3)]"
-        >
-          <span className="text-lg">+</span> إضافة كابتن
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              const headers = "الاسم,الهاتف,السيارة,اللوحة,الحالة,التقييم,الرصيد,الرحلات,ساعات العمل,آخر ظهور,مسجل بواسطة";
+              const rows = drivers.map(d => [d.full_name,d.phone,d.car_type,d.car_plate,d.approval_status,d.rating,d.wallet_balance,d.total_rides,d.working_hours||0,new Date(d.last_seen||'').toLocaleString(),d.registered_by_name||''].join(','));
+              const csv = '\uFEFF' + [headers,...rows].join('\n');
+              const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a'); a.href=url; a.download='الكباتن.csv'; a.click();
+            }}
+            className="bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 font-bold px-4 py-2.5 rounded-xl transition-all flex items-center gap-2 text-sm"
+          >📥 تصدير Excel</button>
+          <button
+            onClick={() => { setShowAddModal(true); setAddError(''); setAddSuccess(''); }}
+            className="bg-[var(--color-brand-500)] hover:bg-[var(--color-brand-600)] text-[#0B0F19] font-bold px-5 py-2.5 rounded-xl transition-all active:scale-95 flex items-center gap-2 shadow-[0_0_15px_rgba(0,200,83,0.3)]"
+          >
+            <span className="text-lg">+</span> إضافة كابتن
+          </button>
+        </div>
       </div>
 
       {error && (

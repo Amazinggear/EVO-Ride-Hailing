@@ -24,6 +24,7 @@ const ALL_GENERAL_ITEMS = [
   { href: "/dashboard/financials", icon: "📈", label: "التقارير المالية", roles: ["super_admin", "finance"] },
   { href: "/dashboard/audit", icon: "🔍", label: "سجل التدقيق", roles: ["super_admin", "support"] },
   { href: "/dashboard/admins", icon: "🛡️", label: "الصلاحيات", roles: ["super_admin"] },
+  { href: "/dashboard/system-logs", icon: "📋", label: "سجل النظام", roles: ["super_admin"] },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
