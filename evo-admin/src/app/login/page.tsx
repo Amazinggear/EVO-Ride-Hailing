@@ -16,11 +16,26 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for cold start
+    // Retry helper
+    const fetchWithRetry = async (url: string, options: RequestInit, retries = 3): Promise<Response> => {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 20000);
+          const res = await fetch(url, { ...options, signal: controller.signal });
+          clearTimeout(timeout);
+          return res; // return whatever response, even errors
+        } catch (err) {
+          if (i === retries - 1) throw err;
+          setError(`🔄 الخادم يصحى من السبات... المحاولة ${i + 1}/3`);
+          await new Promise(r => setTimeout(r, 3000));
+        }
+      }
+      throw new Error('Failed after retries');
+    };
 
-      const res = await fetch(
+    try {
+      const res = await fetchWithRetry(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/login`,
         {
           method: "POST",
@@ -29,25 +44,22 @@ export default function LoginPage() {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({ email, password }),
-          signal: controller.signal
         }
       );
       
-      clearTimeout(timeoutId);
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || "خطأ في تسجيل الدخول");
+      if (!res.ok) {
+        setError(data.error || "كلمة المرور أو البريد الإلكتروني غير صحيح");
+        setLoading(false);
+        return;
+      }
 
       // Store token
       localStorage.setItem("evo_admin_token", data.accessToken);
       router.push("/dashboard");
     } catch (err: any) {
-      if (err.name === 'AbortError' || err.message === 'Failed to fetch') {
-        setError("يبدو أن الخادم كان في وضع السبات (Render Free Tier). يرجى المحاولة مرة أخرى الآن.");
-      } else {
-        setError(err.message || "حدث خطأ");
-      }
-    } finally {
+      setError("❌ تعذر الاتصال بالخادم بعد 3 محاولات. يرجى المحاولة لاحقاً.");
       setLoading(false);
     }
   };
@@ -133,9 +145,7 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-gray-600 text-xs mt-6">
-          EVO Admin v1.0 · Jordan 🇯🇴
-        </p>
+        <p className="text-center text-gray-600 text-xs mt-6">      </p>
       </div>
     </div>
   );
