@@ -158,8 +158,8 @@ adminRouter.use(authenticate, requireRole('admin'));
 // Helper: gate routes to specific admin roles (super_admin always passes)
 const gate = (...roles) => requireRole('super_admin', ...roles);
 
-adminRouter.get('/dashboard/stats', adminController.getDashboardStats);
-adminRouter.get('/stats', adminController.getDashboardStats); // alias
+adminRouter.get('/dashboard/stats', gate('operations', 'finance'), adminController.getDashboardStats);
+adminRouter.get('/stats', gate('operations', 'finance'), adminController.getDashboardStats); // alias
 
 // Users
 adminRouter.get('/users', gate('operations', 'support'), adminController.listUsers);
@@ -230,7 +230,7 @@ router.post('/admin/drivers/onboarding/:token', async (req, res) => {
 adminRouter.get('/rides/live', gate('operations'), adminController.getLiveRides);
 
 // Admin rides list (paginated)
-adminRouter.get('/rides', gate('operations'), async (req, res) => {
+adminRouter.get('/rides', gate('operations', 'support'), async (req, res) => {
   const { query } = require('../config/database');
   try {
     const { status, from, to, page = 1, limit = 20 } = req.query;
@@ -297,7 +297,7 @@ adminRouter.get('/rides', gate('operations'), async (req, res) => {
 });
 
 // Admin drivers list — filtered by registered_by for non-super_admin
-adminRouter.get('/drivers', gate('operations'), async (req, res) => {
+adminRouter.get('/drivers', gate('operations', 'support'), async (req, res) => {
   const { query } = require('../config/database');
   try {
     const { status, search } = req.query;
@@ -408,9 +408,9 @@ adminRouter.get('/financials/transactions', gate('finance'), adminController.get
 adminRouter.get('/audit-logs', gate('support'), adminController.getAuditLogs);
 
 // Complaints
-adminRouter.get('/complaints', gate('support'), getComplaints);
-adminRouter.patch('/complaints/:id/status', gate('support'), updateComplaintStatus);
-adminRouter.patch('/complaints/:id/assign', gate('support'), assignComplaint);
+adminRouter.get('/complaints', gate('operations', 'support'), getComplaints);
+adminRouter.patch('/complaints/:id/status', gate('operations', 'support'), updateComplaintStatus);
+adminRouter.patch('/complaints/:id/assign', gate('operations', 'support'), assignComplaint);
 
 // Notifications
 adminRouter.post('/notifications/send', gate('support'), sendMassNotification);
@@ -438,7 +438,7 @@ adminRouter.post('/activity/ping', async (req, res) => {
 });
 
 // System Logs
-adminRouter.get('/system-logs', async (req, res) => {
+adminRouter.get('/system-logs', gate('super_admin'), async (req, res) => {
   const { query } = require('../config/database');
   try {
     const { category, limit = 50 } = req.query;
@@ -455,7 +455,7 @@ adminRouter.get('/system-logs', async (req, res) => {
 });
 
 // Enhanced Staff Stats (daily/monthly hours + completed ops)
-adminRouter.get('/staff-metrics', async (req, res) => {
+adminRouter.get('/staff-metrics', gate('super_admin'), async (req, res) => {
   const { query } = require('../config/database');
   try {
     const { rows } = await query(`
