@@ -55,14 +55,6 @@ const STATUS_META = {
   rejected: { label: 'مرفوض', color: 'text-red-400',    bg: 'bg-red-500/10',   border: 'border-red-500/20' },
 };
 
-const MOCK_DRIVERS: Driver[] = [
-  { id: 'd1', full_name: 'أحمد محمد الخالدي', phone: '+962791234567', car_type: 'ev_sedan', car_model: 'Tesla Model 3 2023', car_plate: '87-12345', approval_status: 'approved', rating: 4.9, wallet_balance: 12.50, total_rides: 234, created_at: '2025-12-01', cliq_alias: '0791234567', national_id_number: '9912345678', license_number: 'D-1234567' },
-  { id: 'd2', full_name: 'سامر إبراهيم النعيمي', phone: '+962790987654', car_type: 'ev_suv', car_model: 'BYD Atto 3 2024', car_plate: '23-45678', approval_status: 'pending', rating: 0, wallet_balance: 0, total_rides: 0, created_at: '2026-06-12', cliq_alias: '0790987654', national_id_number: '8898765432', license_number: 'D-7654321' },
-  { id: 'd3', full_name: 'خالد يوسف الشمري', phone: '+962795551234', car_type: 'ev_luxury', car_model: 'Mercedes EQS 2024', car_plate: '11-98765', approval_status: 'approved', rating: 5.0, wallet_balance: 45.00, total_rides: 512, created_at: '2025-11-15', cliq_alias: '0795551234', national_id_number: '8765432190', license_number: 'D-9876543' },
-  { id: 'd4', full_name: 'رامي عبدالله حسين', phone: '+962799001122', car_type: 'ev_mini', car_model: 'NETA V 2024', car_plate: '55-33221', approval_status: 'rejected', rating: 0, wallet_balance: 0, total_rides: 0, created_at: '2026-05-20', cliq_alias: '0799001122', national_id_number: '9001122334', license_number: 'D-1122334' },
-  { id: 'd5', full_name: 'محمد علي القاسم', phone: '+962786543210', car_type: 'ev_taxi', car_model: 'BYD Han 2023', car_plate: '34-56789', approval_status: 'approved', rating: 4.7, wallet_balance: 2.30, total_rides: 89, created_at: '2026-01-10', cliq_alias: '0786543210', national_id_number: '7654321098', license_number: 'D-6543210' },
-];
-
 function StarRating({ value }: { value: number }) {
   if (!value) return <span className="text-gray-600 text-xs font-bold">—</span>;
   return (
@@ -118,15 +110,10 @@ export default function DriversPage() {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      setDrivers(data.drivers || data || []);
+      setDrivers(data.drivers || []);
     } catch (err: any) {
       console.error('Fetch drivers error:', err);
-      if (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_API_URL?.includes('onrender.com')) {
-        console.warn('⚠️ Using MOCK_DRIVERS fallback (dev mode only)');
-        setDrivers(MOCK_DRIVERS);
-      } else {
-        setError('تعذر الاتصال بالخادم. تأكد أن السيرفر يعمل على الرابط: ' + (process.env.NEXT_PUBLIC_API_URL || 'localhost:5000'));
-      }
+      setError('تعذر الاتصال بالخادم');
     } finally {
       setLoading(false);
     }
