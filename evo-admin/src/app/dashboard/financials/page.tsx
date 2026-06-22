@@ -121,8 +121,8 @@ export default function FinancialReportsPage() {
                         {txn.type?.includes("recharge") ? "شحن" : txn.type?.includes("commission") ? "عمولة" : txn.type}
                       </span>
                     </td>
-                    <td className={`py-3 px-2 text-center font-bold text-xs ${parseFloat(txn.amount) > 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {parseFloat(txn.amount) > 0 ? "+" : ""}{parseFloat(txn.amount).toFixed(2)} د.أ
+                    <td className={`py-3 px-2 text-center font-bold text-xs ${txn.amount > 0 ? "text-emerald-400" : "text-red-400"}`}>
+                      {txn.amount > 0 ? "+" : ""}{txn.amount.toFixed(2)} د.أ
                     </td>
                     <td className="py-3 px-2 text-center text-gray-500 text-xs">
                       {new Date(txn.created_at).toLocaleDateString("ar-JO", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
