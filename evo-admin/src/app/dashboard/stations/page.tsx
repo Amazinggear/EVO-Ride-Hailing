@@ -67,7 +67,7 @@ export default function ChargingStationsPage() {
     address: s.address || "",
     chargerTypes: s.charger_types || [],
     totalChargers: parseInt(s.total_chargers) || 0,
-    availableChargers: parseInt(s.available_chargers) !== undefined ? parseInt(s.available_chargers) : (parseInt(s.total_chargers) || 0),
+    availableChargers: parseInt(s.available_chargers) || parseInt(s.total_chargers) || 0,
     operator: s.operator || "",
     source: s.source || "manual",
     isVisible: s.is_visible !== undefined ? s.is_visible : true,

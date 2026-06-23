@@ -256,10 +256,10 @@ export default function AuditLogPage() {
         })}
       </div>
 
-      {/* Pagination hint */}
+      {/* Record count */}
       {filtered.length > 0 && (
         <div className="text-center text-xs text-gray-600 py-2">
-          عرض {filtered.length} من {logs.length} سجل — قم بتوصيل الـ API لعرض المزيد
+          عرض {filtered.length} من {logs.length} سجل
         </div>
       )}
     </div>

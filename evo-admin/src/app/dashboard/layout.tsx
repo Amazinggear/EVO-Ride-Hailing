@@ -35,15 +35,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const [profile, setProfile] = useState({
     id: "",
-    fullName: "الإدارة العامة",
-    email: "admin@evo.com",
+    fullName: "",
+    email: "",
     avatarUrl: "",
     role: "admin",
-    adminRole: "super_admin",
+    adminRole: "",
+    createdAt: "",
   });
 
   const [editName, setEditName] = useState("");
@@ -51,12 +51,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [editAvatar, setEditAvatar] = useState("");
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileSaveError, setProfileSaveError] = useState("");
-
-  // Simulated system settings state
-  const [maintenanceMode, setMaintenanceMode] = useState(false);
-  const [liveTrackingInterval, setLiveTrackingInterval] = useState(true);
-  const [securityLevel, setSecurityLevel] = useState("strict");
-  const [newDriverNotify, setNewDriverNotify] = useState(true);
 
   const fetchProfile = async () => {
     const token = localStorage.getItem("evo_admin_token");
@@ -90,12 +84,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       if (res.ok) {
         const data = await res.json();
         setProfile({
-          id: data.id,
-          fullName: data.fullName || "الإدارة العامة",
-          email: data.email || "admin@evo.com",
+          id: data.id || "",
+          fullName: data.fullName || "",
+          email: data.email || "",
           avatarUrl: data.avatarUrl || "",
           role: data.role || "admin",
-          adminRole: data.adminRole || "super_admin",
+          adminRole: data.adminRole || "",
+          createdAt: data.createdAt || "",
         });
       }
     } catch (err) {
@@ -297,8 +292,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[var(--color-brand-500)] via-transparent to-transparent"></div>
             <div className="relative z-10">
               <p className="text-xs text-brand-200 mb-1">المركز الرئيسي</p>
-              <h4 className="font-bold text-lg leading-tight">الإدارة العامة</h4>
-              <p className="text-sm text-brand-300 mt-1 mb-4 font-cy-bold">Administrator</p>
+              <h4 className="font-bold text-lg leading-tight">{profile.fullName || "Admin"}</h4>
+              <p className="text-sm text-brand-300 mt-1 mb-4 font-cy-bold">{profile.adminRole === 'super_admin' ? 'Super Admin' : profile.adminRole || 'Admin'}</p>
               <div className="flex flex-col gap-2">
                 <button onClick={handleBackup} className="bg-[var(--color-brand-500)]/20 text-[var(--color-brand-500)] hover:bg-[var(--color-brand-500)] hover:text-[#0B0F19] transition-colors rounded-lg py-2 px-4 text-xs font-bold w-full text-center flex items-center justify-center gap-2">
                   💾 نسخة احتياطية
@@ -369,13 +364,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       <span className="flex items-center gap-2">👤 الملف الشخصي</span>
                       <span className="text-xs text-gray-500 font-cy-bold">عرض</span>
                     </button>
-                    <button 
-                      onClick={() => { setIsSettingsModalOpen(true); setIsProfileDropdownOpen(false); }} 
-                      className="w-full text-right px-3 py-2 rounded-xl hover:bg-white/5 text-gray-300 hover:text-white transition-colors text-sm font-bold flex items-center justify-between"
-                    >
-                      <span className="flex items-center gap-2">⚙️ إعدادات النظام</span>
-                      <span className="text-xs text-gray-500 font-cy-bold">تحكم</span>
-                    </button>
+
                     <button 
                       onClick={() => { handleBackup(); setIsProfileDropdownOpen(false); }} 
                       className="w-full text-right px-3 py-2 rounded-xl hover:bg-white/5 text-gray-300 hover:text-white transition-colors text-sm font-bold flex items-center justify-between"
@@ -465,7 +454,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                     <div className="bg-[#0B0F19] rounded-xl px-4 py-3 flex justify-between items-center border border-white/5">
                       <p className="text-gray-500 text-xs font-bold">تاريخ الإنشاء</p>
-                      <p className="text-white text-sm font-cy-bold">12 ديسمبر 2024</p>
+                      <p className="text-white text-sm font-cy-bold">{profile.createdAt ? new Date(profile.createdAt).toLocaleDateString("ar-JO") : "—"}</p>
                     </div>
                     <div className="bg-[#0B0F19] rounded-xl p-4 border border-white/5 space-y-2">
                       <p className="text-gray-400 text-xs font-bold mb-2">🛡️ الصلاحيات المفعلة بالكامل:</p>
@@ -483,88 +472,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </div>
                 </>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* SYSTEM SETTINGS MODAL */}
-        {isSettingsModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={() => setIsSettingsModalOpen(false)}>
-            <div className="bg-[var(--color-card)] border border-white/10 rounded-3xl w-full max-w-md p-6 space-y-5 shadow-2xl relative" onClick={e => e.stopPropagation()} dir="rtl">
-              <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                <h2 className="text-lg font-black text-white flex items-center gap-2">⚙️ إعدادات النظام الإدارية</h2>
-                <button onClick={() => setIsSettingsModalOpen(false)} className="text-gray-500 hover:text-white transition-colors text-2xl leading-none">×</button>
-              </div>
-
-              <div className="space-y-4">
-                {/* Toggle 1: Maintenance Mode */}
-                <div className="flex items-center justify-between bg-[#0B0F19] rounded-xl p-4 border border-white/5">
-                  <div className="flex-1 pr-1">
-                    <p className="text-sm font-bold text-white">وضع صيانة المنصة</p>
-                    <p className="text-[10px] text-gray-500 mt-0.5">إيقاف استقبال رحلات جديدة مؤقتاً</p>
-                  </div>
-                  <div 
-                    onClick={() => setMaintenanceMode(!maintenanceMode)}
-                    className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shadow-inner ${maintenanceMode ? "bg-red-500" : "bg-white/10"}`}
-                  >
-                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${maintenanceMode ? "left-7" : "left-1"}`} />
-                  </div>
-                </div>
-
-                {/* Toggle 2: Live Tracking Frequency */}
-                <div className="flex items-center justify-between bg-[#0B0F19] rounded-xl p-4 border border-white/5">
-                  <div className="flex-1 pr-1">
-                    <p className="text-sm font-bold text-white">تحديث التتبع الفوري المباشر</p>
-                    <p className="text-[10px] text-gray-500 mt-0.5">تحديث المواقع كل 5 ثوانٍ تلقائياً</p>
-                  </div>
-                  <div 
-                    onClick={() => setLiveTrackingInterval(!liveTrackingInterval)}
-                    className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shadow-inner ${liveTrackingInterval ? "bg-[var(--color-brand-500)]" : "bg-white/10"}`}
-                  >
-                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${liveTrackingInterval ? "left-7" : "left-1"}`} />
-                  </div>
-                </div>
-
-                {/* Select: Security Level */}
-                <div className="bg-[#0B0F19] rounded-xl p-4 border border-white/5 space-y-2">
-                  <label className="block text-xs text-gray-500 font-bold">درجة الحماية الأمنية (Security Level)</label>
-                  <select 
-                    value={securityLevel}
-                    onChange={(e) => setSecurityLevel(e.target.value)}
-                    className="w-full bg-background border border-white/10 rounded-xl px-3 py-2 text-white text-xs font-bold focus:border-[var(--color-brand-500)] outline-none"
-                  >
-                    <option value="strict">عالي جداً أوتوماتيكي (Strict)</option>
-                    <option value="medium">متوسط (Medium)</option>
-                    <option value="low">منخفض (Low)</option>
-                  </select>
-                </div>
-
-                {/* Toggle 3: New Driver Registration Notification */}
-                <div className="flex items-center justify-between bg-[#0B0F19] rounded-xl p-4 border border-white/5">
-                  <div className="flex-1 pr-1">
-                    <p className="text-sm font-bold text-white">إشعارات تسجيل الكباتن</p>
-                    <p className="text-[10px] text-gray-500 mt-0.5">تنبيه فوري عند تقدم سائق جديد للتسجيل</p>
-                  </div>
-                  <div 
-                    onClick={() => setNewDriverNotify(!newDriverNotify)}
-                    className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer shadow-inner ${newDriverNotify ? "bg-[var(--color-brand-500)]" : "bg-white/10"}`}
-                  >
-                    <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm ${newDriverNotify ? "left-7" : "left-1"}`} />
-                  </div>
-                </div>
-
-                {/* Server Status Indicators */}
-                <div className="border-t border-white/5 pt-4 flex justify-between text-xs text-gray-500 font-bold px-1">
-                  <span className="flex items-center gap-1.5">حالة قاعدة البيانات: <span className="text-emerald-400">🟢 متصل</span></span>
-                  <span className="flex items-center gap-1.5">حالة الـ API Tunnel: <span className="text-emerald-400">🟢 نشط</span></span>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button onClick={() => setIsSettingsModalOpen(false)} className="flex-1 bg-[var(--color-brand-500)] text-[#0B0F19] font-bold py-3 rounded-xl hover:bg-[var(--color-brand-600)] transition-colors text-sm shadow-lg">
-                  حفظ وتطبيق التغييرات
-                </button>
-              </div>
             </div>
           </div>
         )}

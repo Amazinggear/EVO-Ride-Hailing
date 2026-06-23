@@ -1,4 +1,3 @@
-import Image from "next/image";
 
 export default function EvoLogo({ className = "w-24 h-auto" }: { className?: string }) {
   return (

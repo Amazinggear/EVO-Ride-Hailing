@@ -423,7 +423,11 @@ const getFinancialSummary = async (req, res) => {
       FROM transactions WHERE 1=1 ${dateFilter}
     `);
 
-    return res.json({ summary: rows[0] });
+    const { rows: rideCount } = await query(
+      'SELECT COUNT(*) AS total FROM rides'
+    );
+
+    return res.json({ summary: { ...rows[0], total_rides: parseInt(rideCount[0].total) } });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to fetch financial summary' });
   }

@@ -16,6 +16,7 @@ export default function FinancialReportsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [txnLoading, setTxnLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const getToken = () => localStorage.getItem("evo_admin_token") || "";
 
@@ -25,32 +26,50 @@ export default function FinancialReportsPage() {
 
     setLoading(true);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/financials/summary`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { "Bypass-Tunnel-Reminder": "true", Authorization: `Bearer ${token}` },
     })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then(d => {
         if (d.summary) {
           const s = d.summary;
+          const rev = parseFloat(s.total_revenue) || 0;
+          const rides = parseInt(s.total_rides) || 0;
           setSummary({
-            totalRevenue: parseFloat(s.total_revenue) || 0,
+            totalRevenue: rev,
             totalCommission: parseFloat(s.total_commission) || 0,
-            totalRides: parseInt(s.total_rides) || 0,
-            avgFarePerRide: s.total_rides > 0 ? parseFloat(s.total_revenue) / parseInt(s.total_rides) : 0,
+            totalRides: rides,
+            avgFarePerRide: rides > 0 ? rev / rides : 0,
             activeDrivers: parseInt(s.unique_earners) || 0,
             growthRate: 0,
           });
         }
       })
-      .catch(() => {})
+      .catch(err => {
+        console.error("Financial summary error:", err);
+        setError("تعذّر تحميل الملخص المالي");
+      })
       .finally(() => setLoading(false));
 
     setTxnLoading(true);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/financials/transactions?limit=20`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { "Bypass-Tunnel-Reminder": "true", Authorization: `Bearer ${token}` },
     })
-      .then(r => r.json())
-      .then(d => setTransactions(d.transactions || []))
-      .catch(() => {})
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(d => {
+        // Normalize amount: PostgreSQL DECIMAL comes back as string — convert to number
+        const txns = (d.transactions || []).map((t: Record<string, unknown>) => ({
+          ...t,
+          amount: parseFloat(String(t.amount)) || 0,
+        }));
+        setTransactions(txns);
+      })
+      .catch(err => console.error("Transactions error:", err))
       .finally(() => setTxnLoading(false));
   }, []);
 
@@ -61,15 +80,22 @@ export default function FinancialReportsPage() {
         <p className="text-sm text-gray-400 mt-1">تحليل الإيرادات والعمولات من قاعدة البيانات</p>
       </div>
 
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 rounded-2xl px-5 py-4 text-red-400 text-sm font-bold flex items-center gap-3">
+          <span>⚠️</span> {error}
+          <button onClick={() => window.location.reload()} className="mr-auto underline hover:text-red-300">إعادة المحاولة</button>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-white/10 border-t-[var(--color-brand-500)] rounded-full animate-spin" /></div>
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "إجمالي الإيرادات", value: `${summary.totalRevenue.toLocaleString('en-US')} د.أ`, icon: "💰", color: "text-emerald-400", border: "border-emerald-500/20" },
-            { label: "صافي العمولات", value: `${summary.totalCommission.toLocaleString('en-US')} د.أ`, icon: "📊", color: "text-blue-400", border: "border-blue-500/20" },
+            { label: "إجمالي الإيرادات", value: `${summary.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} د.أ`, icon: "💰", color: "text-emerald-400", border: "border-emerald-500/20" },
+            { label: "صافي العمولات", value: `${summary.totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} د.أ`, icon: "📊", color: "text-blue-400", border: "border-blue-500/20" },
             { label: "إجمالي الرحلات", value: summary.totalRides.toLocaleString('en-US'), icon: "🚗", color: "text-purple-400", border: "border-purple-500/20" },
-            { label: "الكباتن النشطين", value: summary.activeDrivers, icon: "👨‍✈️", color: "text-amber-400", border: "border-amber-500/20" },
+            { label: "الكباتن النشطين", value: summary.activeDrivers.toString(), icon: "👨‍✈️", color: "text-amber-400", border: "border-amber-500/20" },
           ].map((card, i) => (
             <div key={i} className={`bg-[var(--color-card)] rounded-2xl p-5 border ${card.border}`}>
               <span className="text-2xl">{card.icon}</span>
@@ -109,26 +135,30 @@ export default function FinancialReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((txn, i) => (
-                  <tr key={txn.id || i} className="border-b border-white/5 last:border-0 hover:bg-white/5">
-                    <td className="py-3 px-2 text-gray-300 font-bold text-xs">{txn.full_name || '—'}</td>
-                    <td className="py-3 px-2 text-center">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${
-                        txn.type?.includes("recharge") ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" :
-                        txn.type?.includes("commission") ? "bg-orange-500/10 text-orange-400 border-orange-500/30" :
-                        "bg-white/5 text-gray-400 border-white/10"
-                      }`}>
-                        {txn.type?.includes("recharge") ? "شحن" : txn.type?.includes("commission") ? "عمولة" : txn.type}
-                      </span>
-                    </td>
-                    <td className={`py-3 px-2 text-center font-bold text-xs ${txn.amount > 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {txn.amount > 0 ? "+" : ""}{txn.amount.toFixed(2)} د.أ
-                    </td>
-                    <td className="py-3 px-2 text-center text-gray-500 text-xs">
-                      {new Date(txn.created_at).toLocaleDateString("ar-JO", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
-                    </td>
-                  </tr>
-                ))}
+                {transactions.map((txn, i) => {
+                  // amount is already normalized to number in fetch handler
+                  const amt = typeof txn.amount === 'number' ? txn.amount : parseFloat(String(txn.amount)) || 0;
+                  return (
+                    <tr key={txn.id || i} className="border-b border-white/5 last:border-0 hover:bg-white/5">
+                      <td className="py-3 px-2 text-gray-300 font-bold text-xs">{txn.full_name || '—'}</td>
+                      <td className="py-3 px-2 text-center">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${
+                          txn.type?.includes("recharge") ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" :
+                          txn.type?.includes("commission") ? "bg-orange-500/10 text-orange-400 border-orange-500/30" :
+                          "bg-white/5 text-gray-400 border-white/10"
+                        }`}>
+                          {txn.type?.includes("recharge") ? "شحن" : txn.type?.includes("commission") ? "عمولة" : txn.type}
+                        </span>
+                      </td>
+                      <td className={`py-3 px-2 text-center font-bold text-xs ${amt > 0 ? "text-emerald-400" : "text-red-400"}`}>
+                        {amt > 0 ? "+" : ""}{amt.toFixed(2)} د.أ
+                      </td>
+                      <td className="py-3 px-2 text-center text-gray-500 text-xs">
+                        {new Date(txn.created_at).toLocaleDateString("ar-JO", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

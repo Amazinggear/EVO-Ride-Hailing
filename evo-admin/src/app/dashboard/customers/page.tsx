@@ -129,7 +129,7 @@ export default function CustomersPage() {
                     <td className="px-5 py-4 font-bold text-white">{customer.full_name}</td>
                     <td className="px-4 py-4 text-gray-300 font-cy-bold" dir="ltr">{customer.phone}</td>
                     <td className="px-4 py-4 text-center">
-                      <span className="text-yellow-400 font-cy-bold text-lg">★ {customer.passenger_rating || "5.0"}</span>
+                      <span className="text-yellow-400 font-cy-bold text-lg">★ {customer.passenger_rating || "—"}</span>
                     </td>
                     <td className="px-4 py-4 text-center">
                       <span className={`font-cy-bold ${customer.cancellation_count > 5 ? "text-red-400" : "text-gray-400"}`}>

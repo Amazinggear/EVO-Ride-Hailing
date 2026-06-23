@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Image from "next/image";
 
 interface PendingDriver {
   id: string;
@@ -37,6 +36,8 @@ export default function PendingDriversPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [adminNote, setAdminNote] = useState("");
   const [actionType, setActionType] = useState<"approve" | "reject" | "more_info" | null>(null);
+  const [actionError, setActionError] = useState("");
+  const [actionSuccess, setActionSuccess] = useState("");
 
   const getToken = () => localStorage.getItem("evo_admin_token") || "";
 
@@ -62,6 +63,8 @@ export default function PendingDriversPage() {
   const handleAction = async () => {
     if (!selectedDriver || !actionType) return;
     setActionLoading(true);
+    setActionError("");
+    setActionSuccess("");
 
     const endpoint = actionType === "approve"
       ? `/api/v1/admin/drivers/${selectedDriver.id}/approve`
@@ -69,18 +72,35 @@ export default function PendingDriversPage() {
       ? `/api/v1/admin/drivers/${selectedDriver.id}/reject`
       : `/api/v1/admin/drivers/${selectedDriver.id}/request-info`;
 
+    const ACTION_LABELS: Record<string, string> = {
+      approve: "تمت الموافقة على الكابتن بنجاح ✅",
+      reject: "تم رفض طلب الكابتن",
+      more_info: "تم إرسال طلب معلومات إضافية",
+    };
+
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${endpoint}`, {
         method: "POST",
         headers: { "Bypass-Tunnel-Reminder": "true", Authorization: `Bearer ${getToken()}`, "Content-Type": "application/json" },
         body: JSON.stringify({ adminNote }),
       });
 
-      setSelectedDriver(null);
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `HTTP ${res.status}`);
+      }
+
+      setActionSuccess(ACTION_LABELS[actionType] || "تمت العملية بنجاح");
       setActionType(null);
       setAdminNote("");
+      setTimeout(() => {
+        setSelectedDriver(null);
+        setActionSuccess("");
+      }, 1500);
       await fetchPending();
-    } catch (err) {
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "فشلت العملية";
+      setActionError(`⚠️ ${msg}`);
       console.error(err);
     } finally {
       setActionLoading(false);
@@ -277,6 +297,19 @@ export default function PendingDriversPage() {
                 >
                   {actionLoading ? "جاري الحفظ..." : "تأكيد القرار وإرسال الإشعار"}
                 </button>
+              )}
+
+              {/* Feedback alerts */}
+              {actionSuccess && (
+                <div className="bg-[var(--color-brand-500)]/10 border border-[var(--color-brand-500)]/30 rounded-xl px-4 py-3 text-[var(--color-brand-500)] text-sm font-bold">
+                  {actionSuccess}
+                </div>
+              )}
+              {actionError && (
+                <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-sm font-bold flex items-center gap-2">
+                  {actionError}
+                  <button onClick={() => setActionError("")} className="mr-auto text-red-400/60 hover:text-red-400 text-xs">✕</button>
+                </div>
               )}
             </div>
           </div>

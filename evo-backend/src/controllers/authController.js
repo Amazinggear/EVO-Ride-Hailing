@@ -229,6 +229,7 @@ const getMe = async (req, res) => {
       adminRole: user.admin_role || null,
       status: user.status,
       preferredLanguage: user.preferred_language,
+      createdAt: user.created_at,
       approvalStatus,
       carType,
     });

@@ -66,11 +66,12 @@ export default function RidesPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/admin/rides?${params}`, {
         headers: { "Bypass-Tunnel-Reminder": "true", Authorization: `Bearer ${getToken()}` },
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setData(json);
-    } catch {
-      console.error('Failed to fetch rides');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'خطأ غير معروف';
+      setError(`تعذّر تحميل الرحلات — ${msg}`);
       setData({ rides: [], total: 0, page: 1, total_pages: 0, summary: { total_rides: 0, total_revenue: 0, total_commission: 0 } });
     } finally {
       setLoading(false);
