@@ -139,6 +139,43 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [isProfileModalOpen, profile]);
 
+  const handleAvatarFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const size = 200; // Optimal square size for mobile & desktop avatars
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          // Center crop calculation
+          const minDim = Math.min(img.width, img.height);
+          const sx = (img.width - minDim) / 2;
+          const sy = (img.height - minDim) / 2;
+
+          ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+
+          // Compress to JPEG at 80% quality (typically 12KB-18KB Base64 payload)
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.8);
+          setEditAvatar(compressedBase64);
+        }
+      };
+      img.onerror = () => {
+        setProfileSaveError("فشل تحميل الصورة المحددة. يرجى تجربة ملف آخر.");
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      setProfileSaveError("حدث خطأ أثناء قراءة الملف.");
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setProfileSaveError("");
@@ -401,6 +438,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   {profileSaveError && (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-red-400 text-sm font-bold">{profileSaveError}</div>
                   )}
+
+                  {/* 📷 Clickable Circle Avatar for Uploading */}
+                  <div className="flex flex-col items-center gap-2 pb-2">
+                    <div className="relative w-20 h-20 rounded-full bg-[var(--color-brand-900)] border-4 border-[var(--color-brand-500)] overflow-hidden shadow-lg group cursor-pointer">
+                      <img 
+                        src={editAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(editName || "Admin")}&background=004219&color=00C853`} 
+                        alt="Edit Avatar" 
+                        className="w-full h-full object-cover" 
+                      />
+                      <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-[10px] text-white font-bold transition-opacity cursor-pointer duration-200">
+                        <span className="text-base mb-0.5">📷</span>
+                        <span>رفع صورة</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleAvatarFileChange} 
+                          className="hidden" 
+                        />
+                      </label>
+                    </div>
+                    <span className="text-[10px] text-gray-400">انقر لتغيير الصورة (تعديل تلقائي ومربع)</span>
+                  </div>
+
                   <div>
                     <label className="text-xs text-gray-400 block mb-1.5 font-bold">الاسم الكامل*</label>
                     <input 
@@ -427,7 +487,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       type="text"
                       value={editAvatar} 
                       onChange={e => setEditAvatar(e.target.value)} 
-                      placeholder="https://example.com/avatar.jpg"
+                      placeholder="رابط الصورة أو كود Base64..."
                       className="w-full bg-[#0B0F19] border border-white/10 rounded-xl py-2.5 px-3 text-sm text-white outline-none focus:border-[var(--color-brand-500)]" 
                       dir="ltr"
                     />
