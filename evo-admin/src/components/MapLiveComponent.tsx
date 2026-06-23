@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { MapContainer, TileLayer, Marker, Polyline, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -154,7 +155,7 @@ export default function MapLiveComponent({ drivers, stations, rides, selectedDri
           const dropoffPos: [number, number] = [ride.dropoff_lat, ride.dropoff_lng];
 
           return (
-            <div key={`ride-elements-${ride.id}`}>
+            <React.Fragment key={`ride-elements-${ride.id}`}>
               <Marker position={pickupPos} icon={pickupIcon}>
                 <Popup>
                   <div className="text-right p-1 font-alexandria text-black">
@@ -184,7 +185,7 @@ export default function MapLiveComponent({ drivers, stations, rides, selectedDri
                   opacity: 0.8
                 }}
               />
-            </div>
+            </React.Fragment>
           );
         })}
       </MapContainer>
