@@ -48,17 +48,18 @@ export default function DashboardHome() {
       {/* LIVE ONLINE COUNTERS */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
-          { label: "🚗 كباتن متصلين", value: s.activeDrivers, color: "border-[var(--color-brand-500)]/30 text-[var(--color-brand-500)]", bg: "bg-[var(--color-brand-500)]/10" },
-          { label: "👥 عملاء متصلين", value: s.onlinePassengers, color: "border-blue-500/30 text-blue-400", bg: "bg-blue-500/10" },
-          { label: "🛡️ موظفين متصلين", value: s.onlineStaff, color: "border-purple-500/30 text-purple-400", bg: "bg-purple-500/10" },
-          { label: "📍 رحلات نشطة", value: s.activeRides, color: "border-amber-500/30 text-amber-400", bg: "bg-amber-500/10" },
-          { label: "⏳ طلبات معلقة", value: s.pendingApprovals, color: "border-orange-500/30 text-orange-400", bg: "bg-orange-500/10" },
-          { label: "💰 إيراد اليوم", value: `${s.totalRevenueToday.toFixed(1)}`, color: "border-green-500/30 text-green-400", bg: "bg-green-500/10" },
+          { icon: "🚗", label: "كباتن متصلين", value: s.activeDrivers, color: "border-[var(--color-brand-500)]/30 text-[var(--color-brand-500)]", bg: "bg-[var(--color-brand-500)]/10" },
+          { icon: "👥", label: "عملاء متصلين", value: s.onlinePassengers, color: "border-blue-500/30 text-blue-400", bg: "bg-blue-500/10" },
+          { icon: "🛡️", label: "موظفين متصلين", value: s.onlineStaff, color: "border-purple-500/30 text-purple-400", bg: "bg-purple-500/10" },
+          { icon: "📍", label: "رحلات نشطة", value: s.activeRides, color: "border-amber-500/30 text-amber-400", bg: "bg-amber-500/10" },
+          { icon: "⏳", label: "طلبات معلقة", value: s.pendingApprovals, color: "border-orange-500/30 text-orange-400", bg: "bg-orange-500/10" },
+          { icon: "💰", label: "إيراد اليوم", value: `${s.totalRevenueToday.toFixed(1)} د.أ`, color: "border-green-500/30 text-green-400", bg: "bg-green-500/10" },
         ].map(c => (
-          <div key={c.label} className={`bg-[var(--color-card)] rounded-2xl p-4 border ${c.color} text-center`}>
-            <div className={`w-10 h-10 ${c.bg} rounded-xl flex items-center justify-center mx-auto mb-2 text-lg`}>
-              {c.value}
+          <div key={c.label} className={`bg-[var(--color-card)] rounded-2xl p-4 border ${c.color} text-center flex flex-col items-center justify-center`}>
+            <div className={`w-10 h-10 ${c.bg} rounded-xl flex items-center justify-center mb-2 text-lg`}>
+              {c.icon}
             </div>
+            <p className="font-bold text-xl mb-1">{c.value}</p>
             <p className="text-gray-400 text-xs font-bold">{c.label}</p>
           </div>
         ))}

@@ -76,7 +76,7 @@ export default function LoginPage() {
         <div className="text-center mb-10 relative">
           <div className="flex items-center justify-center gap-4 mb-6" dir="ltr">
             <EvoLogo className="h-28 drop-shadow-[0_0_15px_rgba(0,200,83,0.8)]" />
-            <span className="text-4xl font-cy-bold tracking-[0.2em] text-white font-bold mt-2" style={{ textShadow: "0 0 20px rgba(255,255,255,0.2)" }}>ADMIN</span>
+            <span className="text-4xl font-cy-bold tracking-[0.2em] text-white font-bold" style={{ textShadow: "0 0 20px rgba(255,255,255,0.2)" }}>ADMIN</span>
           </div>
           <p className="text-gray-400 font-alexandria">أدخل بيانات الاعتماد للوصول إلى لوحة التحكم</p>
         </div>

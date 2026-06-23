@@ -257,7 +257,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_left,_var(--tw-gradient-stops))] from-[var(--color-brand-500)]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="flex items-center gap-3 relative z-10" dir="ltr">
             <EvoLogo className="h-14 drop-shadow-[0_0_8px_rgba(0,200,83,0.6)]" />
-            <span className="text-2xl font-cy-bold tracking-[0.2em] text-white/90 mt-2 font-bold" style={{ textShadow: "0 0 10px rgba(255,255,255,0.1)" }}>ADMIN</span>
+            <span className="text-2xl font-cy-bold tracking-[0.2em] text-white/90 font-bold" style={{ textShadow: "0 0 10px rgba(255,255,255,0.1)" }}>ADMIN</span>
           </div>
         </div>
 
