@@ -369,12 +369,12 @@ export default function DriversPage() {
                         </td>
                         <td className="px-4 py-4"><StarRating value={driver.rating} /></td>
                         <td className="px-4 py-4">
-                          <span className={`font-cy-bold text-sm ${driver.wallet_balance < 3 && driver.approval_status === 'approved' ? 'text-red-400' : 'text-white'}`}>
-                            {driver.wallet_balance.toFixed(2)} <span className="text-gray-500 text-[10px] font-bold">د.أ</span>
+                          <span className={`font-cy-bold text-sm ${Number(driver.wallet_balance) < 3 && driver.approval_status === 'approved' ? 'text-red-400' : 'text-white'}`}>
+                            {Number(driver.wallet_balance).toFixed(2)} <span className="text-gray-500 text-[10px] font-bold">د.أ</span>
                           </span>
                         </td>
                         <td className="px-4 py-4 text-white font-cy-bold">{driver.total_rides.toLocaleString('en-US')}</td>
-                        <td className="px-4 py-4 text-white font-cy-bold text-xs">{driver.working_hours?.toFixed(1) || '—'} س</td>
+                        <td className="px-4 py-4 text-white font-cy-bold text-xs">{driver.working_hours ? Number(driver.working_hours).toFixed(1) : '—'} س</td>
                         <td className="px-4 py-4"><TimeAgo date={driver.last_seen} /></td>
                         <td className="px-4 py-4 text-gray-300 text-xs font-bold">{driver.registered_by_name || '—'}</td>
                         <td className="px-4 py-4 text-center">

@@ -35,24 +35,6 @@ const ALL_CAR_TYPES = [
   { key: 'ev_luxury', emoji: '💎', name: 'فاخر' },
 ];
 
-const MOCK_PROMOS: PromoCode[] = [
-  {
-    id: 'p1', code: 'EVO2026', discount_type: 'percentage', discount_value: 20,
-    valid_from: '2026-01-01', valid_until: '2026-12-31', max_uses: 500,
-    max_per_user: 1, used_count: 142, car_types: ['ev_mini','ev_taxi','ev_sedan','ev_suv','ev_luxury'], is_active: true,
-  },
-  {
-    id: 'p2', code: 'WELCOME5', discount_type: 'fixed', discount_value: 0.5,
-    valid_from: '2026-01-01', valid_until: '2026-06-01', max_uses: 200,
-    max_per_user: 1, used_count: 200, car_types: ['ev_sedan','ev_suv'], is_active: false,
-  },
-  {
-    id: 'p3', code: 'LUXRIDE', discount_type: 'percentage', discount_value: 15,
-    valid_from: '2026-06-01', valid_until: '2026-09-30', max_uses: null,
-    max_per_user: 3, used_count: 8, car_types: ['ev_luxury'], is_active: true,
-  },
-];
-
 const TODAY = new Date().toISOString().split('T')[0];
 
 function getPromoStatus(promo: PromoCode): { label: string; color: string; bg: string; border: string } {
@@ -98,10 +80,6 @@ export default function PromosPage() {
       })));
     } catch (err: any) {
       console.error('Fetch promos error:', err);
-      if (process.env.NODE_ENV === 'development' && !process.env.NEXT_PUBLIC_API_URL?.includes('onrender.com')) {
-        console.warn('⚠️ Using MOCK_PROMOS fallback (dev mode only)');
-        setPromos(MOCK_PROMOS);
-      }
     } finally {
       setLoading(false);
     }

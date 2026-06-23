@@ -27,21 +27,6 @@ const ACTION_CONFIG: Record<string, { label: string; icon: string; color: string
   surge_zone_created: { label: "إنشاء منطقة ارتفاع", icon: "📍", color: "text-pink-400", bg: "bg-pink-500/10 border-pink-500/20" },
 };
 
-const MOCK_LOGS: AuditLog[] = [
-  { id: "1", adminId: "admin-1", adminName: "الإدارة العامة", action: "driver_approved", targetType: "driver", targetId: "d-123", details: { driverName: "أحمد الخالدي", plate: "12-34567" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T23:01:00Z" },
-  { id: "2", adminId: "admin-1", adminName: "الإدارة العامة", action: "wallet_recharged", targetType: "driver", targetId: "d-456", details: { plate: "87-12345", amount: 20, driverName: "محمد العبادي" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T22:50:00Z" },
-  { id: "3", adminId: "admin-1", adminName: "الإدارة العامة", action: "pricing_updated", targetType: "pricing", details: { carType: "ev_mini", oldBaseFare: 0.35, newBaseFare: 0.40 }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T22:30:00Z" },
-  { id: "4", adminId: "admin-1", adminName: "الإدارة العامة", action: "driver_rejected", targetType: "driver", targetId: "d-789", details: { driverName: "ناصر الربيع", reason: "المستندات غير مكتملة" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T22:15:00Z" },
-  { id: "5", adminId: "admin-1", adminName: "الإدارة العامة", action: "promo_created", targetType: "promo", details: { code: "EVO20", discountType: "percentage", value: 20 }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T21:55:00Z" },
-  { id: "6", adminId: "admin-1", adminName: "الإدارة العامة", action: "wallet_recharged", targetType: "driver", details: { plate: "33-45678", amount: 15, driverName: "عمر الشرع" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T21:40:00Z" },
-  { id: "7", adminId: "admin-1", adminName: "الإدارة العامة", action: "more_info_requested", targetType: "driver", details: { driverName: "سلمى الحموري", note: "صورة الرخصة غير واضحة" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T21:20:00Z" },
-  { id: "8", adminId: "admin-1", adminName: "الإدارة العامة", action: "surge_zone_created", targetType: "surge_zone", details: { zoneName: "دوار الداخلية", multiplier: 1.5 }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T20:58:00Z" },
-  { id: "9", adminId: "admin-1", adminName: "الإدارة العامة", action: "driver_approved", targetType: "driver", details: { driverName: "خالد النجار", plate: "56-78901" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T20:30:00Z" },
-  { id: "10", adminId: "admin-1", adminName: "الإدارة العامة", action: "admin_login", targetType: "system", details: { browser: "Chrome 120" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T20:00:00Z" },
-  { id: "11", adminId: "admin-1", adminName: "الإدارة العامة", action: "promo_updated", targetType: "promo", details: { code: "WELCOME10", change: "تمديد الصلاحية حتى 2026-12-31" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T19:45:00Z" },
-  { id: "12", adminId: "admin-1", adminName: "الإدارة العامة", action: "wallet_recharged", targetType: "driver", details: { plate: "45-67890", amount: 25, driverName: "ياسر الحمود" }, ipAddress: "192.168.1.10", createdAt: "2026-06-17T19:20:00Z" },
-];
-
 const formatTime = (iso: string) => {
   const d = new Date(iso);
   return d.toLocaleString("ar-JO-u-nu-latn", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });

@@ -26,14 +26,6 @@ const CAR_TYPES = [
   { key: 'ev_luxury', emoji: '💎', name: 'فاخر',  color: 'border-[#00C853]/30 shadow-[0_0_15px_rgba(0,200,83,0.1)]',  accent: 'text-[#00C853]',  glow: 'bg-[#00C853]/10 text-[#00C853] border-[#00C853]/20' },
 ];
 
-const MOCK_PRICING: PricingConfig[] = [
-  { car_type: 'ev_mini',   base_fare: 0.50, per_km_rate: 0.25, per_min_rate: 0.04, min_fare: 1.00, commission_pct: 13 },
-  { car_type: 'ev_taxi',   base_fare: 0.60, per_km_rate: 0.28, per_min_rate: 0.05, min_fare: 1.20, commission_pct: 13 },
-  { car_type: 'ev_sedan',  base_fare: 0.70, per_km_rate: 0.30, per_min_rate: 0.05, min_fare: 1.50, commission_pct: 13 },
-  { car_type: 'ev_suv',    base_fare: 0.90, per_km_rate: 0.35, per_min_rate: 0.06, min_fare: 2.00, commission_pct: 13 },
-  { car_type: 'ev_luxury', base_fare: 1.20, per_km_rate: 0.45, per_min_rate: 0.08, min_fare: 2.50, commission_pct: 13 },
-];
-
 function calcFare(cfg: EditableConfig): string {
   const km = 10, min = 15;
   const base  = parseFloat(cfg.base_fare)   || 0;

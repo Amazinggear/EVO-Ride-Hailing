@@ -41,33 +41,6 @@ const CAR_EMOJIS: Record<string, string> = {
   ev_mini: '🛵', ev_taxi: '🚕', ev_sedan: '🚗', ev_suv: '🚙', ev_luxury: '💎',
 };
 
-function genMockRides(): Ride[] {
-  const drivers = ['أحمد الخالدي', 'سامر النعيمي', 'خالد الشمري', 'محمد القاسم', 'رامي حسين'];
-  const passengers = ['يوسف العمري', 'ليلى منصور', 'كريم صالح', 'نور الحمدان', 'سارة البكر', 'هاني الشريف'];
-  const areas = ['العبدلي', 'الدوار السابع', 'الجبيهة', 'صويلح', 'مرج الحمام', 'الرابية', 'خلدا', 'عبدون'];
-  const statuses: Ride['status'][] = ['completed', 'completed', 'completed', 'cancelled', 'in_progress'];
-  const carTypes = ['ev_mini', 'ev_taxi', 'ev_sedan', 'ev_suv', 'ev_luxury'];
-
-  return Array.from({ length: 25 }, (_, i) => {
-    const fare = parseFloat((1.5 + Math.random() * 8).toFixed(3));
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    return {
-      id: `r${i + 1}`,
-      ride_number: `EVO-${String(10000 + i).padStart(5, '0')}`,
-      driver_name: drivers[Math.floor(Math.random() * drivers.length)],
-      passenger_name: passengers[Math.floor(Math.random() * passengers.length)],
-      pickup_area: areas[Math.floor(Math.random() * areas.length)],
-      dropoff_area: areas[Math.floor(Math.random() * areas.length)],
-      distance_km: parseFloat((2 + Math.random() * 18).toFixed(1)),
-      fare,
-      commission: parseFloat((fare * 0.13).toFixed(3)),
-      status,
-      car_type: carTypes[Math.floor(Math.random() * carTypes.length)],
-      created_at: new Date(Date.now() - Math.random() * 86400000 * 7).toISOString(),
-    };
-  });
-}
-
 const PAGE_LIMIT = 20;
 
 export default function RidesPage() {

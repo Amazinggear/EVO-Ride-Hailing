@@ -29,14 +29,6 @@ interface ChargingStation {
   lastSynced?: string;
 }
 
-const MOCK_STATIONS: ChargingStation[] = [
-  { id: "1", name: "Mecca Mall EV Station", nameAr: "محطة شحن مكة مول", lat: 31.9541, lng: 35.8836, address: "مكة مول، الرابع، عمّان", chargerTypes: ["Type2", "CCS"], totalChargers: 8, availableChargers: 5, operator: "Zain EV", source: "opencharge_map", isVisible: true, isVerified: true, lastSynced: "2026-06-17T20:00:00Z" },
-  { id: "2", name: "City Mall Charging Hub", nameAr: "مركز شحن سيتي مول", lat: 31.9757, lng: 35.9058, address: "سيتي مول، تلاع العلي، عمّان", chargerTypes: ["Type2", "CHAdeMO", "CCS"], totalChargers: 12, availableChargers: 8, operator: "Orange EV", source: "opencharge_map", isVisible: true, isVerified: true, lastSynced: "2026-06-17T20:00:00Z" },
-  { id: "3", name: "Al-Abdali Station", nameAr: "محطة العبدلي", lat: 31.9757, lng: 35.9244, address: "العبدلي، وسط البلد، عمّان", chargerTypes: ["CCS"], totalChargers: 4, availableChargers: 2, operator: "حكومية", source: "manual", isVisible: true, isVerified: false },
-  { id: "4", name: "Swefieh EV Point", nameAr: "نقطة شحن الصويفية", lat: 31.9573, lng: 35.8789, address: "الصويفية، عمّان", chargerTypes: ["Type2"], totalChargers: 3, availableChargers: 0, operator: "خاص", source: "manual", isVisible: false, isVerified: false },
-  { id: "5", name: "Motor City Charger", nameAr: "شاحن موتور سيتي", lat: 31.9406, lng: 35.8672, address: "ماركا الجنوبية، عمّان", chargerTypes: ["Type2", "CCS"], totalChargers: 6, availableChargers: 4, operator: "Aramex EV", source: "opencharge_map", isVisible: true, isVerified: true, lastSynced: "2026-06-17T19:30:00Z" },
-];
-
 const CHARGER_COLORS: Record<string, string> = {
   "Type2": "bg-blue-500/20 text-blue-400 border-blue-500/30",
   "CCS": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
